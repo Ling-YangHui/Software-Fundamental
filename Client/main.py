@@ -93,6 +93,9 @@ class Main(QtWidgets.QWidget,Main_Ui_Form):
     def addGroupRequest(self):
         if self.addGroupLine.text() != '':
             try:
+                if self.addGroupLine.text().isdigit() == False:
+                    self.remindLine.setText("加群失败，请检查群组ID后重试！")
+                    return
                 if not self.clientCore.addGroup(self.userIDLabel.text(), self.addGroupLine.text()):
                     self.remindLine.setText("加群失败，请检查群组ID后重试！")
                 else:
@@ -104,10 +107,13 @@ class Main(QtWidgets.QWidget,Main_Ui_Form):
     def inviteAddGroup(self):
         if self.inviteFriendLine.text() != '':
             try:
-                friendID = self.inviteFriendLine.text()
-                groupID = self.inviteGroupLine.text()
+                friendID:str = self.inviteFriendLine.text()
+                groupID:str = self.inviteGroupLine.text()
                 if groupID == '':
                     groupID = self.clientCore.groupList[self.nowChosenGroup][0]
+                if friendID.isdigit() == False or groupID.isdigit() == False:
+                    self.remindLine.setText("邀请失败，请检查好友及群组ID后重试！")
+                    return
                 if not self.clientCore.addGroup(friendID, groupID):
                     self.remindLine.setText("邀请失败，请检查好友及群组ID后重试！")
                 else:
