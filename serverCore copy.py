@@ -4,6 +4,7 @@ import queue
 import random
 import json
 
+
 class USERLIST(object):  # 用户列表类
 
     # 子类
@@ -26,15 +27,16 @@ class USERLIST(object):  # 用户列表类
             self.p2pIP = ''
             self.isCalling = False
             self.isFiling = False
-            self.waiting = -1 # 请求通话的对面用户ID，通话进行中也复用为正在通话的ID
-            self.waitingFile = -1 # 请求发送文件的用户ID，文件发送中也复用为正在发送文件的ID
+            self.waiting = -1  # 请求通话的对面用户ID，通话进行中也复用为正在通话的ID
+            self.waitingFile = -1  # 请求发送文件的用户ID，文件发送中也复用为正在发送文件的ID
 
         def joinGroup(self, groupID):
             try:
                 self.selfLock.acquire()
                 if not groupID in self.groupList:
                     self.groupList.append(groupID)
-                    userJson = {'Name':self.Name, 'PSD':self.PSD, 'LoginID':self.loginID, 'GroupList':self.groupList, 'ID':self.ID}
+                    userJson = {'Name': self.Name, 'PSD': self.PSD,
+                                'LoginID': self.loginID, 'GroupList': self.groupList, 'ID': self.ID}
                     jsonList.setUserJson(userJson)
                 self.selfLock.release()
             except Exception as Error:
@@ -142,7 +144,8 @@ class USERLIST(object):  # 用户列表类
                 if arg != 'ask':
                     message = 'UserGroupListRefresh$'
                 for index in self.groupList:
-                    message += str(groupList.ID2searchID(index)) + '%' + groupList.getName(index) + '$' # index为群组ID
+                    message += str(groupList.ID2searchID(index)) + \
+                        '%' + groupList.getName(index) + '$'  # index为群组ID
                 self.sendMessageToUser(message)
             except Exception as Error:
                 print(Error)
@@ -161,16 +164,17 @@ class USERLIST(object):  # 用户列表类
         try:
             NewUser = self.USER(Name, PSD, self.__nextUserID)
             self.__nextUserID += 1
-            loginID = random.randint(1000,9999)
+            loginID = random.randint(1000, 9999)
             while loginID in self.__loginIDList:
-                loginID = random.randint(1000,9999)
+                loginID = random.randint(1000, 9999)
             NewUser.loginID = loginID
             self.__userListLock.acquire()
             self.__userList.append(NewUser)
             self.__loginIDList.append(loginID)
             self.__userListLock.release()
 
-            newUserDict = {'Name':Name, 'PSD':PSD, 'ID':self.__nextUserID - 1, 'LoginID':loginID, 'GroupList':[]}
+            newUserDict = {'Name': Name, 'PSD': PSD,
+                           'ID': self.__nextUserID - 1, 'LoginID': loginID, 'GroupList': []}
             jsonList.setUserJson(newUserDict, new=True)
         # 任何错误都要抛出一个异常，并且表示运行执行错误
         except Exception as Error:
@@ -186,7 +190,7 @@ class USERLIST(object):  # 用户列表类
             NewUser.loginID = index['LoginID']
             self.__userList.append(NewUser)
             self.__loginIDList.append(index['LoginID'])
-            self.__nextUserID += 1         
+            self.__nextUserID += 1
 
     def userLogin(self, ID, PSD, connect):
         # 直接查找对应的列表，捕捉indexError
@@ -237,7 +241,7 @@ class USERLIST(object):  # 用户列表类
 
     def setOffFiling(self, ID):
         return self.__userList[ID].setFiling(arg='offFiling')
-    
+
     def setOnFiling(self, ID):
         return self.__userList[ID].setFiling(arg='onFiling')
 
@@ -309,14 +313,16 @@ class GROUPLIST(object):  # 群聊组表类
                 if ID in self.memberList:
                     continue
                 self.memberList.append(ID)
-                groupJson = {'ID':self.ID, 'SearchID':self.searchID, 'MemberList':self.memberList, 'Name':self.Name}
+                groupJson = {'ID': self.ID, 'SearchID': self.searchID,
+                             'MemberList': self.memberList, 'Name': self.Name}
                 jsonList.setGroupJson(groupJson)
-
 
         def sendMessage(self):
             while (self.messageQueue.empty() == False):
                 message = self.messageQueue.get()
-                message = 'GroupMessage$' + str(groupList.ID2searchID(self.ID)) + '$' + self.Name + '$' + message
+                message = 'GroupMessage$' + \
+                    str(groupList.ID2searchID(self.ID)) + \
+                    '$' + self.Name + '$' + message
                 for i in self.memberList:
                     userList.sendMessageToUser(i, message)
 
@@ -333,13 +339,14 @@ class GROUPLIST(object):  # 群聊组表类
         try:
             newGroup = self.GROUP(Name, self.__nextGroupID)
             self.__nextGroupID += 1
-            newGroupThread = threading.Thread(target=newGroup.serveThreadFunction)
+            newGroupThread = threading.Thread(
+                target=newGroup.serveThreadFunction)
             newGroupThread.setDaemon(True)
             newGroupThread.start()
 
-            searchID = random.randint(100,999)
+            searchID = random.randint(100, 999)
             while searchID in self.__searchIDList:
-                searchID = random.randint(100,999)
+                searchID = random.randint(100, 999)
             newGroup.searchID = searchID
             self.__groupListLock.acquire()
             self.__searchIDList.append(searchID)
@@ -347,7 +354,8 @@ class GROUPLIST(object):  # 群聊组表类
             self.__groupThreadList.append(newGroupThread)
             self.__groupListLock.release()
 
-            groupJson = {'Name':Name, 'ID':self.__nextGroupID - 1, 'MemberList':[], 'SearchID':searchID}
+            groupJson = {'Name': Name, 'ID': self.__nextGroupID -
+                         1, 'MemberList': [], 'SearchID': searchID}
             jsonList.setGroupJson(groupJson, new=True)
 
         except Exception as Error:
@@ -362,7 +370,8 @@ class GROUPLIST(object):  # 群聊组表类
             self.__nextGroupID += 1
             newGroup.memberList = index['MemberList']
             newGroup.searchID = index['SearchID']
-            newGroupThread = threading.Thread(target=newGroup.serveThreadFunction)
+            newGroupThread = threading.Thread(
+                target=newGroup.serveThreadFunction)
             newGroupThread.setDaemon(True)
             newGroupThread.start()
 
@@ -416,7 +425,7 @@ class LINKLIST(object):
         # 为了防止属性出现混连，在USER类中不声明任何私有属性，所有私有属性在__init__里面下载好
 
         def __init__(self, connect):  # 初始化一个连接
-            self.__connect = connect
+            self.__connect: socket = connect
             self.__userID = -1
             self.__userName = ''
 
@@ -430,10 +439,10 @@ class LINKLIST(object):
             self.__connect.settimeout(10)  # 设置超时
             while True:
                 try:
-                    stringByte:bytes = self.__connect.recv(65536)
-                    string:bytearray = bytearray(stringByte)
-                    string = string.replace(b'\x00',b'')
-                    string:str = string.decode('utf8')
+                    stringByte: bytes = self.__connect.recv(65536)
+                    string: bytearray = bytearray(stringByte)
+                    string = string.replace(b'\x00', b'')
+                    string: str = string.decode('utf8')
                     if string == '':
                         continue
 
@@ -442,11 +451,13 @@ class LINKLIST(object):
                     orderList = string.split('$')
                     if orderList[0] == 'RegisterRequest':  # 处理注册请求 只有在注册请求的时候才可以修改用户列表的数值
                         # Name PSD
-                        loginID = userList.regNewUser(orderList[1], orderList[2])
+                        loginID = userList.regNewUser(
+                            orderList[1], orderList[2])
                         if loginID == -1:
                             self.sendFalse('RegisterRequest')
                         else:
-                            self.__connect.send(('RegisterID$' + str(loginID)).encode('utf8'))  # 把获取到的ID回传回去
+                            self.__connect.send(
+                                ('RegisterID$' + str(loginID)).encode('utf8'))  # 把获取到的ID回传回去
                             self.sendTrue('RegisterRequest')
 
                     elif orderList[0] == 'LoginRequest':  # 处理登陆请求
@@ -454,11 +465,13 @@ class LINKLIST(object):
                         if userList.userLogin(userList.loginID2ID(int(orderList[1])), orderList[2], self.__connect) == False:
                             self.sendFalse('LoginRequest')
                         else:
-                            self.__userID = userList.loginID2ID(int(orderList[1]))
+                            self.__userID = userList.loginID2ID(
+                                int(orderList[1]))
                             self.__userName = userList.getName(self.__userID)
                             userList.setP2PIP(self.__userID, orderList[3])
                             self.sendTrue('LoginRequest')
-                            userList.sendMessageToUser(self.__userID, 'UserName$' + self.__userName)
+                            userList.sendMessageToUser(
+                                self.__userID, 'UserName$' + self.__userName)
 
                     elif orderList[0] == 'BuildGroup' and self.__userID != -1:  # 处理建群请求
                         # GName
@@ -467,7 +480,8 @@ class LINKLIST(object):
                             self.sendFalse('BuildGroup')
                         else:
                             self.sendTrue('BuildGroup')
-                            userList.sendMessageToUser(self.__userID, 'NewGroupID$' + str(searchID))
+                            userList.sendMessageToUser(
+                                self.__userID, 'NewGroupID$' + str(searchID))
 
                     elif orderList[0] == 'AddGroup' and self.__userID != -1:  # 处理加群请求
                         # GID LoginID
@@ -484,14 +498,14 @@ class LINKLIST(object):
 
                     elif orderList[0] == 'RefreshGroupList' and self.__userID != -1:
                         userList.refreshUserGroupList(self.__userID)
-                    
+
                     elif orderList[0] == 'SendMessage' and self.__userID != -1:  # 处理发送请求
                         # GID Message
                         groupListCache = userList.getGroupList(self.__userID)
                         GID = groupList.searchID2ID(int(orderList[1]))
                         if GID in groupListCache:
                             text = ''
-                            for index in range(2,len(orderList)):
+                            for index in range(2, len(orderList)):
                                 text += orderList[index]
                                 text += '$'
                             message = self.__userName + '$' + text
@@ -502,7 +516,7 @@ class LINKLIST(object):
                         else:
                             self.sendFalse('SendMessage')
 
-                    elif orderList[0] == 'RequireCalling' and self.__userID != -1: # 处理p2p通话请求
+                    elif orderList[0] == 'RequireCalling' and self.__userID != -1:  # 处理p2p通话请求
                         # Target
                         targetID = userList.loginID2ID(int(orderList[1]))
                         if not userList.findIDValid(targetID):
@@ -513,37 +527,44 @@ class LINKLIST(object):
                         if userList.getOnline(targetID) == False:
                             self.sendFalse('RequireCalling')
                         else:
-                            userList.sendMessageToUser(targetID, 'RequireCalling$' + str(userList.ID2LoginID(self.__userID)))
+                            userList.sendMessageToUser(
+                                targetID, 'RequireCalling$' + str(userList.ID2LoginID(self.__userID)))
                             userList.setWaiting(self.__userID, targetID)
                             userList.setWaiting(targetID, self.__userID)
-                            userList.setOnCalling(targetID) # 声明进入通讯模式，其余不可接入
+                            userList.setOnCalling(targetID)  # 声明进入通讯模式，其余不可接入
                             userList.setOnCalling(self.__userID)
                             self.sendTrue('RequireCalling')
 
                     elif orderList[0] == 'CloseCalling' and self.__userID != -1:
                         # 关闭双方占线状态
                         userList.setOffCalling(self.__userID)
-                        userList.setOffCalling(userList.getWaitingTarget(self.__userID))
+                        userList.setOffCalling(
+                            userList.getWaitingTarget(self.__userID))
                         # 发送关闭指令
-                        userList.sendMessageToUser(self.__userID, 'CallingEnd$')
-                        userList.sendMessageToUser(userList.getWaitingTarget(self.__userID), 'CallingEnd$')
+                        userList.sendMessageToUser(
+                            self.__userID, 'CallingEnd$')
+                        userList.sendMessageToUser(
+                            userList.getWaitingTarget(self.__userID), 'CallingEnd$')
                         # 消除通话对象
                         targetID = userList.getWaitingTarget(self.__userID)
                         userList.setWaiting(self.__userID, -1)
                         userList.setWaiting(targetID, -1)
                         self.sendTrue('CloseCalling')
-                        
+
                     elif orderList[0] == 'ReceiveCalling' and self.__userID != -1:
                         # 发送IP包
-                        userList.sendMessageToUser(userList.getWaitingTarget(self.__userID), 'ReceiveCalling$' + userList.getP2PIP(self.__userID))
+                        userList.sendMessageToUser(userList.getWaitingTarget(
+                            self.__userID), 'ReceiveCalling$' + userList.getP2PIP(self.__userID))
                         self.sendTrue('ReceiveCalling')
 
                     elif orderList[0] == 'RefuseCalling' and self.__userID != -1:
                         # 关闭双方占线状态
                         userList.setOffCalling(self.__userID)
-                        userList.setOffCalling(userList.getWaitingTarget(self.__userID))
+                        userList.setOffCalling(
+                            userList.getWaitingTarget(self.__userID))
                         # 发送拒绝代码
-                        userList.sendMessageToUser(userList.getWaitingTarget(self.__userID), 'RefuseCalling$')
+                        userList.sendMessageToUser(
+                            userList.getWaitingTarget(self.__userID), 'RefuseCalling$')
                         # 消除通话对象
                         targetID = userList.getWaitingTarget(self.__userID)
                         userList.setWaiting(self.__userID, -1)
@@ -563,15 +584,19 @@ class LINKLIST(object):
                             userList.setWaitingFile(targetID, self.__userID)
                             userList.setOnFiling(targetID)
                             userList.setOnFiling(self.__userID)
-                            userList.sendMessageToUser(targetID, 'FileSending$' + str(userList.ID2LoginID(self.__userID)))
-                    
+                            userList.sendMessageToUser(
+                                targetID, 'FileSending$' + str(userList.ID2LoginID(self.__userID)))
+
                     elif orderList[0] == 'FileSendingClose' and self.__userID != -1:
                         # 关闭占线状态
                         userList.setOffFiling(self.__userID)
-                        userList.setOffFiling(userList.getWaitingFileTarget(self.__userID))
+                        userList.setOffFiling(
+                            userList.getWaitingFileTarget(self.__userID))
                         # 发送关闭指令
-                        userList.sendMessageToUser(self.__userID, 'FileSendingClose$')
-                        userList.sendMessageToUser(userList.getWaitingFileTarget(self.__userID), 'FileSendingClose$')
+                        userList.sendMessageToUser(
+                            self.__userID, 'FileSendingClose$')
+                        userList.sendMessageToUser(userList.getWaitingFileTarget(
+                            self.__userID), 'FileSendingClose$')
                         # 消除通话对象
                         targetID = userList.getWaitingFileTarget(self.__userID)
                         userList.setWaitingFile(self.__userID, -1)
@@ -581,9 +606,11 @@ class LINKLIST(object):
                     elif orderList[0] == 'RefuseFileSending' and self.__userID != -1:
                         # 关闭双方占线状态
                         userList.setOffFiling(self.__userID)
-                        userList.setOffFiling(userList.getWaitingTarget(self.__userID))
+                        userList.setOffFiling(
+                            userList.getWaitingTarget(self.__userID))
                         # 发送拒绝代码
-                        userList.sendMessageToUser(userList.getWaitingTarget(self.__userID), 'RefuseFileSending$')
+                        userList.sendMessageToUser(userList.getWaitingTarget(
+                            self.__userID), 'RefuseFileSending$')
                         # 消除通话对象
                         targetID = userList.getWaitingFileTarget(self.__userID)
                         userList.setWaitingFile(self.__userID, -1)
@@ -591,9 +618,9 @@ class LINKLIST(object):
                         self.sendTrue('RefuseFileSending')
 
                     elif orderList[0] == 'ReceiveFileSending' and self.__userID != -1:
-                        userList.sendMessageToUser(userList.getWaitingFileTarget(self.__userID), 'ReceiveFileSending$' + userList.getP2PIP(self.__userID))
+                        userList.sendMessageToUser(userList.getWaitingFileTarget(
+                            self.__userID), 'ReceiveFileSending$' + userList.getP2PIP(self.__userID))
                         self.sendTrue('ReceiveFileSending')
-                            
 
                 # 连接出现错误
                 except socket.timeout:
@@ -628,12 +655,13 @@ class LINKLIST(object):
     def delLinkThread(self, thread):
         self.__linkThreadList.remove(thread)
 
+
 class JSONLIST(object):
 
     def __init__(self):
         self.userJsonFilePath = 'userInfo.json'
         file = open(self.userJsonFilePath, 'r')
-        self.userJsonList:list
+        self.userJsonList: list
         self.userJsonList = json.load(file)
         self.userJsonList.sort(key=self.sortKey)
         file.close()
@@ -641,7 +669,7 @@ class JSONLIST(object):
 
         self.groupJsonFilePath = 'groupInfo.json'
         file = open(self.groupJsonFilePath, 'r')
-        self.groupJsonList:list
+        self.groupJsonList: list
         self.groupJsonList = json.load(file)
         self.groupJsonList.sort(key=self.sortKey)
         file.close()
@@ -693,6 +721,7 @@ class JSONLIST(object):
         with open(self.groupJsonFilePath, 'w') as file:
             json.dump(self.groupJsonList, file)
         self.groupListLock.release()
+
 
 # 监听初始化
 IP = '127.0.0.1'

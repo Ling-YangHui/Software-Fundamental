@@ -8,7 +8,7 @@ import numpy as npy
 class GETAUDIO():
 
     def __init__(self):
-        self.selfHostIP = "192.168.43.73"
+        self.selfHostIP = "127.0.0.1"
         self.audioPort = 8086
         self.videoPort = 7001
         self.serverAudio = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -33,10 +33,10 @@ class GETAUDIO():
         self.serverAudio.listen(10)
         self.audioConnect, addr = self.serverAudio.accept()
 
-        self.serverVideo = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.serverVideo.bind((self.selfHostIP, self.videoPort))
-        self.serverVideo.listen(10)
-        self.videoConnect, addr = self.serverVideo.accept()
+        # self.serverVideo = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        # self.serverVideo.bind((self.selfHostIP, self.videoPort))
+        # self.serverVideo.listen(10)
+        # self.videoConnect, addr = self.serverVideo.accept()
 
         print("RECV!")
         self.connectionType = "SERVER"
@@ -114,9 +114,9 @@ ta = threading.Thread(target=g.audioThread)
 ta.setDaemon(True)
 ta.start()
 
-tv = threading.Thread(target=g.videoThread)
-tv.setDaemon(True)
-tv.start()
+# tv = threading.Thread(target=g.videoThread)
+# tv.setDaemon(True)
+# tv.start()
 
 ta.join()
-tv.join()
+# tv.join()
