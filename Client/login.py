@@ -18,7 +18,7 @@ class Login(QtWidgets.QWidget, Ui_Form):
     #发送注册信息，QLineEdit类中text()方法返回框中输入的文本
     def sendRegisterRequest(self):
         if self.Password_Line.text().__len__() < 6:
-            self.Dispaly_Lable.setText('密码强度不足?')
+            self.Dispaly_Lable.setText('密码强度不足')
             return
         if self.clientCore.register(self.Username_Line.text(),self.Password_Line.text()):
             while self.clientCore.registerID == '':
