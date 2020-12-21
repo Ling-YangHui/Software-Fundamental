@@ -2,6 +2,7 @@ import sys
 import datetime
 import threading
 from PyQt5.QtWidgets import QApplication, QMainWindow, QDialog
+from PyQt5 import QtCore
 from clientCore import CLIENTCORE
 from main_ui import *
 # from groupchat import *
