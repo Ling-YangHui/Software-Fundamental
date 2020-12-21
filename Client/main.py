@@ -2,7 +2,7 @@ import sys
 import datetime
 import threading
 from PyQt5.QtWidgets import QApplication, QMainWindow, QDialog
-from clientCore import clientCore
+from clientCore import CLIENTCORE
 from main_ui import *
 # from groupchat import *
 
@@ -14,7 +14,7 @@ class Main(QtWidgets.QWidget,Main_Ui_Form):
         super(Main,self).__init__(parent)
         self.setupUi(self)
         self.groupChatWidgetList = []
-        self.clientCore:clientCore
+        self.clientCore:CLIENTCORE
         self.clientCore = client
         self.buildGroupButton.clicked.connect(self.buildGroupRequest)
         self.addGroupButton.clicked.connect(self.addGroupRequest)

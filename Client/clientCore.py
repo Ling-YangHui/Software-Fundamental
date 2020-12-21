@@ -29,7 +29,7 @@ class heartBeatPackage():
                 self.socketTarget.send(bytes(1))
                 time.sleep(8)
 
-class clientCore():
+class CLIENTCORE():
 
     def __init__(self):
         self.link = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -227,7 +227,7 @@ class clientCore():
             return
 
 
-# SOC = clientCore()
+# SOC = CLIENTCORE()
 # while True:
 #     string = input()
 #     stringList = string.split('$')

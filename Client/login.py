@@ -12,7 +12,7 @@ class Login(QtWidgets.QWidget, Ui_Form):
         self.setupUi(self)
         self.Register_Line.clicked.connect(self.sendRegisterRequest)
         self.Login_Button.clicked.connect(self.sendLoginRequest)
-        self.clientCore = clientCore()
+        self.clientCore = CLIENTCORE()
         self.ipAddr = socket.gethostbyname(socket.gethostname())
 
     #发送注册信息，QLineEdit类中text()方法返回框中输入的文本
