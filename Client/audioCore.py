@@ -3,6 +3,12 @@ import threading
 import pyaudio
 
 
+class AudioError(Exception):
+    def __init__(self, error):
+        self.error = error
+    def __str__(self, *args, **kwargs):
+        return self.error
+
 class AUDIOSERVER:
 
     CHUNK = 1024
@@ -11,10 +17,10 @@ class AUDIOSERVER:
     RATE = 44100
     RECORD_SECONDS = 1
 
-    def __init__(self, IP, clientCore):
+    def __init__(self, IP, clientCore, port):
         self.audioServer = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.clientCore = clientCore
-        self.audioServer.bind((IP, 8086))
+        self.audioServer.bind((IP, port))
         self.audioServer.listen(16)
         self.breakFlag = False
 
@@ -50,10 +56,15 @@ class AUDIOSERVER:
                     data = self.audioInputStream.read(self.CHUNK)
                     self.connect.send(data)
                 else:
-                    self.connect.shutdown(socket.SHUT_RDWR)
-        except Exception as E:
+                    raise AudioError('')
+                    return
+        except ConnectionResetError:
             self.audioInputStream.close()
             return
+        except AudioError:
+            self.audioInputStream.close()
+            return
+            
 
     def playAudio(self):
         try:
@@ -62,12 +73,20 @@ class AUDIOSERVER:
                     data = self.connect.recv(65536)
                     self.audioOutputStream.write(data)
                 else:
+                    raise AudioError('')
                     return
-        except Exception:
+        except ConnectionResetError:
             self.clientCore.messageQueue.put('CallingBreak$')
             self.clientCore.messageEvent.set()
             self.breakFlag = True
             self.audioOutputStream.close()
+            self.audioInThread.join()
+            self.pyAU.terminate()
+            return
+        except AudioError:
+            self.audioOutputStream.close()
+            self.audioInThread.join()
+            self.connect.shutdown(socket.SHUT_RDWR)
             self.pyAU.terminate()
             return
 
@@ -105,6 +124,9 @@ class AUDIOCLIENT:
         self.audioOutThread.setDaemon(True)
         self.audioOutThread.start()
 
+    def closeAudio(self):
+        self.breakFlag = True
+
     def collectAudio(self):
         try:
             while True:
@@ -112,9 +134,12 @@ class AUDIOCLIENT:
                     data = self.audioInputStream.read(self.CHUNK)
                     self.audioClient.send(data)
                 else:
-                    self.audioClient.shutdown(socket.SHUT_RDWR)
+                    raise AudioError('')
                     return
-        except Exception as E:
+        except ConnectionResetError:
+            self.audioInputStream.close()
+            return
+        except AudioError:
             self.audioInputStream.close()
             return
 
@@ -125,12 +150,20 @@ class AUDIOCLIENT:
                     data = self.audioClient.recv(65536)
                     self.audioOutputStream.write(data)
                 else:
+                    raise AudioError('')
                     return
-        except Exception:
-            self.breakFlag = True
-            self.clientCore.messageQueue.put('CallingBreak')
+        except ConnectionResetError:
+            self.clientCore.messageQueue.put('CallingBreak$')
             self.clientCore.messageEvent.set()
+            self.breakFlag = True
             self.audioOutputStream.close()
+            self.audioInThread.join()
             self.pyAU.terminate()
             return
-    
+        except AudioError:
+            self.audioOutputStream.close()
+            self.audioInThread.join()
+            self.connect.shutdown(socket.SHUT_RDWR)
+            self.pyAU.terminate()
+            return
+        

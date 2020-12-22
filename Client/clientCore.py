@@ -4,9 +4,11 @@ import time
 import queue
 from audioCore import AUDIOSERVER,AUDIOCLIENT
 
-# serverIP = '127.0.0.1'
-serverIP = '192.168.43.205'
+serverIP = '127.0.0.1'
+# serverIP = '192.168.43.205'
 serverPort = 1919
+audioPort = 8087
+connectPort = 8086
 
 class clientError(Exception):
     def __init__(self, error):
@@ -53,8 +55,8 @@ class CLIENTCORE():
         self.orderThread.setDaemon(True)
         self.orderThread.start()
         # 通话服务器设置
-        # self.audioServer = AUDIOSERVER(socket.gethostbyname(socket.gethostname()), self)
-        self.audioServer = AUDIOSERVER('192.168.43.205', self)
+        self.audioServer = AUDIOSERVER(socket.gethostbyname(socket.gethostname()), self, audioPort)
+        # self.audioServer = AUDIOSERVER('192.168.43.205', self)
         # 其他变量
         self.registerID = ''
         self.ID = ''
@@ -64,6 +66,7 @@ class CLIENTCORE():
         self.sendToFrontQueue = queue.Queue()
         self.requireCallingTarget = ''
         self.callingIP = ''
+        self.callingPos = 'slave'
         
     def waitString(self):
         while True:
@@ -84,12 +87,16 @@ class CLIENTCORE():
                         self.requireCallingTarget = stringList[1]
                         self.sendToFrontQueue.put('AskingCalling')
                         self.sendToFrontEvent.set()
+                        self.callingPos = 'slave' # 服务器
+                        self.audioServer.breakFlag = False
 
                     elif stringList[0] == 'ReceiveCallingIP':
                         self.callingIP = stringList[1]
-                        self.audioClient = AUDIOCLIENT(self.callingIP, 8086, self)
-                        self.sendToFrontQueue.put('ReceiveCallingIP')
+                        self.audioClient = AUDIOCLIENT(self.callingIP, connectPort, self)
+                        self.sendToFrontQueue.put('ReceiveCalling')
                         self.sendToFrontEvent.set()
+                        self.callingPos = 'master' # 客户端
+                        self.audioClient.breakFlag = False
 
                     elif stringList[0] == 'PassRefuseCalling':
                         self.callingIP = ''
@@ -106,7 +113,7 @@ class CLIENTCORE():
                     elif stringList[0] == 'CallingBreak':
                         self.callingIP = ''
                         self.requireCallingTarget = ''
-                        self.sendToFrontQueue.put('CallingBreak')
+                        self.sendToFrontQueue.put('CallingEnd')
                         self.sendToFrontEvent.set()
 
                     elif stringList[0] == 'UserName':
@@ -259,6 +266,7 @@ class CLIENTCORE():
     def requireCalling(self, targetID):
         try:
             self.link.send(('RequireCalling$' + targetID).encode('utf8'))
+            self.requireCallingTarget = targetID
             successRecv = False
             while not successRecv:
                 string = self.messageQueue.get(True,timeout=5)
@@ -283,9 +291,13 @@ class CLIENTCORE():
                     self.messageQueue.put(string)
                 else:
                     successRecv = True
-            if stringList == 'True':
+            if stringList[1] == 'True':
+                if self.callingPos == 'master':
+                    self.audioClient.closeAudio()
+                else:
+                    self.audioServer.closeAudio()
                 self.messageQueue.put('CallingEnd')
-                self.messageQueue.set()
+                self.messageEvent.set()
             return (stringList[1] == 'True')
         except Exception:
             return False
@@ -304,6 +316,8 @@ class CLIENTCORE():
             
             if stringList[1] == 'True':
                 self.audioServer.startAudio()
+                self.sendToFrontQueue.put('ReceiveCalling')
+                self.sendToFrontEvent.set()
 
             return (stringList[1] == 'True')
         except Exception:

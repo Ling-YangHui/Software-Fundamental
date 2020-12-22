@@ -436,7 +436,7 @@ class LINKLIST(object):
             self.__connect.send((string + '$True').encode('utf8'))
 
         def listenCommand(self):  # 一个单独运行的线程，对对应的connect进行监听
-            self.__connect.settimeout(10)  # 设置超时
+            self.__connect.settimeout(10000)  # 设置超时
             while True:
                 try:
                     stringByte: bytes = self.__connect.recv(65536)
@@ -722,7 +722,7 @@ class JSONLIST(object):
 
 
 # 监听初始化
-IP = '192.168.43.205'
+IP = '127.0.0.1'
 port = 1919
 
 SOC = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  # 设置socket模式

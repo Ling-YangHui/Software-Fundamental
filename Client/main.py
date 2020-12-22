@@ -12,7 +12,8 @@ class Main(QtWidgets.QWidget,Main_Ui_Form):
     #初始化
     messageSignal = QtCore.pyqtSignal(str) # 消息信号槽
     groupRefreshSignal = QtCore.pyqtSignal(str) # 群组信号槽
-    askCallingSignal = QtCore.pyqtSignal(str) # 电话信号槽
+    askCallingSignal = QtCore.pyqtSignal(str) # 电话请求信号槽
+    showCallingSignal = QtCore.pyqtSignal(str) # 电话接通信号槽
     def __init__(self,client,parent = None):
         super(Main,self).__init__(parent)
         self.setupUi(self)
@@ -43,6 +44,7 @@ class Main(QtWidgets.QWidget,Main_Ui_Form):
         self.messageSignal.connect(self.showMessage)
         self.groupRefreshSignal.connect(self.groupListWidgetCmd)
         self.askCallingSignal.connect(self.beAskedCalling)
+        self.showCallingSignal.connect(self.showCalling)
 
         self.groupListWidget.doubleClicked.connect(self.changeGroup)
         # self.groupListWidget.clicked.connect(self.changeGroup)
@@ -83,10 +85,29 @@ class Main(QtWidgets.QWidget,Main_Ui_Form):
                     if string == 'AskingCalling':
                         self.askCallingSignal.emit('trig')
 
+                    if string == 'ReceiveCalling':
+                        self.showCallingSignal.emit('open')
+
+                    if string == 'CallingEnd':
+                        self.showCallingSignal.emit('close')
+
                 self.clientCore.sendToFrontEvent.clear()
             except Exception:
                 continue
                 
+    def showCalling(self, string):
+        if string == 'open':
+            self.p2pCallingRequestLine.setText(self.clientCore.requireCallingTarget + ' 通话中')
+            self.isCalling = True
+            self.sendOrCloseP2PButton.setText('关闭')
+            self.p2pCallingRequestLine.setReadOnly(False)
+        elif string == 'close':
+            self.p2pCallingRequestLine.clear()
+            self.isCalling = False
+            self.sendOrCloseP2PButton.setText('开始')
+            self.p2pCallingRequestLine.setReadOnly(False)
+
+
     def beAskedCalling(self, string):
         askCallingBox = QMessageBox(QMessageBox.Critical, '通信请求', self.clientCore.requireCallingTarget+ ' 请求通话', QMessageBox.NoButton, self)
         acceptButton = askCallingBox.addButton('接受', QMessageBox.YesRole)
@@ -97,6 +118,7 @@ class Main(QtWidgets.QWidget,Main_Ui_Form):
         acceptButton.clicked.connect(askCallingBox.close)
         refuseButton.clicked.connect(self.clientCore.refuseCalling)
         refuseButton.clicked.connect(askCallingBox.close)
+        askCallingBox.show()
 
     def buildGroupRequest(self):
         if self.buildGroupLine.text() != '':
