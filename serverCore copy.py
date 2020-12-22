@@ -528,7 +528,7 @@ class LINKLIST(object):
                             self.sendFalse('RequireCalling')
                         else:
                             userList.sendMessageToUser(
-                                targetID, 'RequireCalling$' + str(userList.ID2LoginID(self.__userID)))
+                                targetID, 'AskingCalling$' + str(userList.ID2LoginID(self.__userID)))
                             userList.setWaiting(self.__userID, targetID)
                             userList.setWaiting(targetID, self.__userID)
                             userList.setOnCalling(targetID)  # 声明进入通讯模式，其余不可接入
@@ -554,7 +554,7 @@ class LINKLIST(object):
                     elif orderList[0] == 'ReceiveCalling' and self.__userID != -1:
                         # 发送IP包
                         userList.sendMessageToUser(userList.getWaitingTarget(
-                            self.__userID), 'ReceiveCalling$' + userList.getP2PIP(self.__userID))
+                            self.__userID), 'ReceiveCallingIP$' + userList.getP2PIP(self.__userID))
                         self.sendTrue('ReceiveCalling')
 
                     elif orderList[0] == 'RefuseCalling' and self.__userID != -1:
@@ -564,7 +564,7 @@ class LINKLIST(object):
                             userList.getWaitingTarget(self.__userID))
                         # 发送拒绝代码
                         userList.sendMessageToUser(
-                            userList.getWaitingTarget(self.__userID), 'RefuseCalling$')
+                            userList.getWaitingTarget(self.__userID), 'PassRefuseCalling$')
                         # 消除通话对象
                         targetID = userList.getWaitingTarget(self.__userID)
                         userList.setWaiting(self.__userID, -1)
@@ -724,7 +724,7 @@ class JSONLIST(object):
 
 
 # 监听初始化
-IP = '127.0.0.1'
+IP = '192.168.43.205'
 port = 1919
 
 SOC = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  # 设置socket模式

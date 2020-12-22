@@ -1,6 +1,7 @@
 import socket
 import threading
 import pyaudio
+from .clientCore import CLIENTCORE
 
 
 class AUDIOSERVER:
@@ -11,10 +12,11 @@ class AUDIOSERVER:
     RATE = 44100
     RECORD_SECONDS = 1
 
-    def __init__(self, IP):
+    def __init__(self, IP, clientCore):
         self.audioServer = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.clientCore:CLIENTCORE = clientCore
         self.audioServer.bind((IP, 8086))
-        self.audioServer.listen(1)
+        self.audioServer.listen(16)
         self.breakFlag = False
 
     def startAudio(self):
@@ -38,6 +40,9 @@ class AUDIOSERVER:
         self.audioOutThread = threading.Thread(target=self.playAudio)
         self.audioOutThread.setDaemon(True)
         self.audioOutThread.start()
+
+    def closeAudio(self):
+        self.breakFlag = True
 
     def collectAudio(self):
         try:

@@ -5,6 +5,7 @@ from PyQt5.QtWidgets import QApplication, QMainWindow, QDialog
 from PyQt5 import QtCore
 from clientCore import CLIENTCORE
 from main_ui import *
+from PyQt5.Qt import QMessageBox
 # from groupchat import *
 
 class Main(QtWidgets.QWidget,Main_Ui_Form):
@@ -75,6 +76,18 @@ class Main(QtWidgets.QWidget,Main_Ui_Form):
                                 self.groupMessage.append([])
                         self.finishedGroupInit = True
                         self.groupRefreshSignal.emit('trig')
+
+                    if string == 'AskCalling':
+                        askCallingBox = QMessageBox(QMessageBox.Critical, '通信请求', self.clientCore.requireCallingTarget+ ' 请求通话', QMessageBox.NoButton, self)
+                        acceptButton = askCallingBox.addButton('接受', QMessageBox.YesRole)
+                        refuseButton = askCallingBox.addButton('拒绝', QMessageBox.YesRole)
+                        askCallingBox.setIcon(1)
+                        askCallingBox.setGeometry(900,500,0,0)
+                        acceptButton.clicked.connect(self.clientCore.receiveCalling)
+                        acceptButton.clicked.connect(askCallingBox.close)
+                        refuseButton.clicked.connect(self.clientCore.refuseCalling)
+                        refuseButton.clicked.connect(askCallingBox.close)
+
                 self.clientCore.sendToFrontEvent.clear()
             except Exception:
                 continue
@@ -126,16 +139,14 @@ class Main(QtWidgets.QWidget,Main_Ui_Form):
 
     def sendP2PCallingRequset(self):
         if self.p2pCallingRequestLine.text() != '':
-            # //此处添加发送P2P通话请求代码
-            if True:
+            if self.clientCore.requireCalling(self.p2pCallingRequestLine.text()):
                self.p2pCallingRequestLine.setText("正在与{}进行通话".format(self.p2pCallingRequestLine.text()))
                self.p2pCallingRequestLine.setReadOnly(True)
                self.sendOrCloseP2PButton.setText("关闭")
                self.sendOrCloseP2PButton.clicked.connect(self.closeP2PRequest)
 
     def closeP2PRequest(self):
-        # //此处添加关闭P2P通话请求代码
-        if True:
+        if self.clientCore.closeCalling():
             self.p2pCallingRequestLine.clear()
             self.p2pCallingRequestLine.setReadOnly(False)
             self.sendOrCloseP2PButton.clicked.connect(self.sendP2PCallingRequset)

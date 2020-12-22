@@ -2,6 +2,7 @@ import socket
 import threading
 import time
 import queue
+from audioCore import AUDIOSERVER,AUDIOCLIENT
 
 serverIP = '127.0.0.1'
 serverPort = 1919
@@ -50,6 +51,8 @@ class CLIENTCORE():
         self.orderThread = threading.Thread(target=self.receiveOrder)
         self.orderThread.setDaemon(True)
         self.orderThread.start()
+        # 通话服务器设置
+        self.audioServer = AUDIOSERVER(socket.gethostbyname(socket.gethostname()), self)
         # 其他变量
         self.registerID = ''
         self.ID = ''
@@ -58,6 +61,7 @@ class CLIENTCORE():
         self.groupList = []
         self.sendToFrontQueue = queue.Queue()
         self.requireCallingTarget = ''
+        self.callingIP = ''
         
     def waitString(self):
         while True:
@@ -74,9 +78,33 @@ class CLIENTCORE():
                     string = self.messageQueue.get()
                     stringList = string.split('$')
 
-                    if stringList[0] == 'RequireCalling':
+                    if stringList[0] == 'AskingCalling':
                         self.requireCallingTarget = stringList[1]
-                        self.sendToFrontQueue.put('RequireCalling')
+                        self.sendToFrontQueue.put('AskingCalling')
+                        self.sendToFrontEvent.set()
+
+                    elif stringList[0] == 'ReceiveCallingIP':
+                        self.callingIP = stringList[1]
+                        self.audioClient = AUDIOCLIENT(self.callingIP, 8086, self)
+                        self.sendToFrontQueue.put('ReceiveCallingIP')
+                        self.sendToFrontEvent.set()
+
+                    elif stringList[0] == 'PassRefuseCalling':
+                        self.callingIP = ''
+                        self.requireCallingTarget = ''
+                        self.sendToFrontQueue.put('PassRefuseCalling')
+                        self.sendToFrontEvent.set()
+
+                    elif stringList[0] == 'CallingEnd':
+                        self.callingIP = ''
+                        self.requireCallingTarget = ''
+                        self.sendToFrontQueue.put('CallingEnd')
+                        self.sendToFrontEvent.set()
+
+                    elif stringList[0] == 'CallingBreak':
+                        self.callingIP = ''
+                        self.requireCallingTarget = ''
+                        self.sendToFrontQueue.put('CallingBreak')
                         self.sendToFrontEvent.set()
 
                     elif stringList[0] == 'UserName':
@@ -206,7 +234,7 @@ class CLIENTCORE():
                     successRecv = True
             return (stringList[1] == 'True')
         except Exception:
-            return
+            return False
 
     def addGroup(self, userID, groupID):
         try:
@@ -224,7 +252,74 @@ class CLIENTCORE():
                 self.refreshGroupList()
             return (stringList[1] == 'True')
         except Exception:
-            return
+            return False
+
+    def requireCalling(self, targetID):
+        try:
+            self.link.send(('RequireCalling$' + targetID).encode('utf8'))
+            successRecv = False
+            while not successRecv:
+                string = self.messageQueue.get(True,timeout=5)
+                stringList = string.split('$')
+                if stringList[0] != 'RequireCalling':
+                    self.messageQueue.put(string)
+                else:
+                    successRecv = True
+            
+            return (stringList[1] == 'True')
+        except Exception:
+            return False
+
+    def closeCalling(self):
+        try:
+            self.link.send('CloseCalling$'.encode('utf8'))
+            successRecv = False
+            while not successRecv:
+                string = self.messageQueue.get(True, timeout=5)
+                stringList = string.split('$')
+                if stringList[0] != 'CloseCalling':
+                    self.messageQueue.put(string)
+                else:
+                    successRecv = True
+            
+            return (stringList[1] == 'True')
+        except Exception:
+            return False
+        
+    def receiveCalling(self):
+        try:
+            self.link.send('ReceiveCalling'.encode('utf8'))
+            successRecv = False
+            while not successRecv:
+                string = self.messageQueue.get(True,timeout=5)
+                stringList = string.split('$')
+                if stringList[0] != 'ReceiveCalling':
+                    self.messageQueue.put(string)
+                else:
+                    successRecv = True
+            
+            if stringList[1] == 'True':
+                self.audioServer.startAudio()
+
+            return (stringList[1] == 'True')
+        except Exception:
+            return False
+
+    def refuseCalling(self):
+        try:
+            self.link.send('RefuseCalling$'.encode('utf8'))
+            successRecv = False
+            while not successRecv:
+                string = self.messageQueue.get(True, timeout=5)
+                stringList = string.split('$')
+                if stringList[0] != 'RefuseCalling':
+                    self.messageQueue.put(string)
+                else:
+                    successRecv = True
+            
+            return (stringList[1] == 'True')
+        except Exception:
+            return False
 
 
 # SOC = CLIENTCORE()
