@@ -12,6 +12,7 @@ class Main(QtWidgets.QWidget,Main_Ui_Form):
     #初始化
     messageSignal = QtCore.pyqtSignal(str) # 消息信号槽
     groupRefreshSignal = QtCore.pyqtSignal(str) # 群组信号槽
+    askCallingSignal = QtCore.pyqtSignal(str) # 电话信号槽
     def __init__(self,client,parent = None):
         super(Main,self).__init__(parent)
         self.setupUi(self)
@@ -32,6 +33,7 @@ class Main(QtWidgets.QWidget,Main_Ui_Form):
         # 标志
         self.finishedGroupInit = False
         self.nowChosenGroup = 0
+        self.isCalling = False
 
         self.getMessageThread = threading.Thread(target=self.getMessageFromCore)
         self.getMessageThread.setDaemon(True)
@@ -40,6 +42,7 @@ class Main(QtWidgets.QWidget,Main_Ui_Form):
         # 线程信号槽分布
         self.messageSignal.connect(self.showMessage)
         self.groupRefreshSignal.connect(self.groupListWidgetCmd)
+        self.askCallingSignal.connect(self.beAskedCalling)
 
         self.groupListWidget.doubleClicked.connect(self.changeGroup)
         # self.groupListWidget.clicked.connect(self.changeGroup)
@@ -77,21 +80,23 @@ class Main(QtWidgets.QWidget,Main_Ui_Form):
                         self.finishedGroupInit = True
                         self.groupRefreshSignal.emit('trig')
 
-                    if string == 'AskCalling':
-                        askCallingBox = QMessageBox(QMessageBox.Critical, '通信请求', self.clientCore.requireCallingTarget+ ' 请求通话', QMessageBox.NoButton, self)
-                        acceptButton = askCallingBox.addButton('接受', QMessageBox.YesRole)
-                        refuseButton = askCallingBox.addButton('拒绝', QMessageBox.YesRole)
-                        askCallingBox.setIcon(1)
-                        askCallingBox.setGeometry(900,500,0,0)
-                        acceptButton.clicked.connect(self.clientCore.receiveCalling)
-                        acceptButton.clicked.connect(askCallingBox.close)
-                        refuseButton.clicked.connect(self.clientCore.refuseCalling)
-                        refuseButton.clicked.connect(askCallingBox.close)
+                    if string == 'AskingCalling':
+                        self.askCallingSignal.emit('trig')
 
                 self.clientCore.sendToFrontEvent.clear()
             except Exception:
                 continue
                 
+    def beAskedCalling(self, string):
+        askCallingBox = QMessageBox(QMessageBox.Critical, '通信请求', self.clientCore.requireCallingTarget+ ' 请求通话', QMessageBox.NoButton, self)
+        acceptButton = askCallingBox.addButton('接受', QMessageBox.YesRole)
+        refuseButton = askCallingBox.addButton('拒绝', QMessageBox.YesRole)
+        askCallingBox.setIcon(1)
+        askCallingBox.setGeometry(900,500,0,0)
+        acceptButton.clicked.connect(self.clientCore.receiveCalling)
+        acceptButton.clicked.connect(askCallingBox.close)
+        refuseButton.clicked.connect(self.clientCore.refuseCalling)
+        refuseButton.clicked.connect(askCallingBox.close)
 
     def buildGroupRequest(self):
         if self.buildGroupLine.text() != '':
@@ -138,19 +143,20 @@ class Main(QtWidgets.QWidget,Main_Ui_Form):
                 self.remindLine.setText("邀请失败，请检查好友及群组ID后重试！")
 
     def sendP2PCallingRequset(self):
-        if self.p2pCallingRequestLine.text() != '':
+        print(1)
+        if self.p2pCallingRequestLine.text() != '' and self.p2pCallingRequestLine.text().isdigit() and self.isCalling == False:
             if self.clientCore.requireCalling(self.p2pCallingRequestLine.text()):
                self.p2pCallingRequestLine.setText("正在与{}进行通话".format(self.p2pCallingRequestLine.text()))
                self.p2pCallingRequestLine.setReadOnly(True)
                self.sendOrCloseP2PButton.setText("关闭")
-               self.sendOrCloseP2PButton.clicked.connect(self.closeP2PRequest)
+               self.isCalling = True
+        elif self.isCalling == True:
+            if self.clientCore.closeCalling():
+                self.p2pCallingRequestLine.clear()
+                self.p2pCallingRequestLine.setReadOnly(False)
+                self.sendOrCloseP2PButton.setText("开始")
+                self.isCalling = False
 
-    def closeP2PRequest(self):
-        if self.clientCore.closeCalling():
-            self.p2pCallingRequestLine.clear()
-            self.p2pCallingRequestLine.setReadOnly(False)
-            self.sendOrCloseP2PButton.clicked.connect(self.sendP2PCallingRequset)
-            self.sendOrCloseP2PButton.setText("开始")
             
     def sendP2PMessage(self):
         #toPlainText()方法可以获取当前文本编辑器内的多行文本

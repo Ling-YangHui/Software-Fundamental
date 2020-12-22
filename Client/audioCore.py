@@ -65,6 +65,7 @@ class AUDIOSERVER:
                     return
         except Exception:
             self.clientCore.messageQueue.put('CallingBreak$')
+            self.clientCore.messageEvent.set()
             self.breakFlag = True
             self.audioOutputStream.close()
             self.pyAU.terminate()
@@ -128,6 +129,7 @@ class AUDIOCLIENT:
         except Exception:
             self.breakFlag = True
             self.clientCore.messageQueue.put('CallingBreak')
+            self.clientCore.messageEvent.set()
             self.audioOutputStream.close()
             self.pyAU.terminate()
             return

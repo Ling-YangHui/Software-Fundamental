@@ -4,7 +4,8 @@ import time
 import queue
 from audioCore import AUDIOSERVER,AUDIOCLIENT
 
-serverIP = '127.0.0.1'
+# serverIP = '127.0.0.1'
+serverIP = '192.168.43.205'
 serverPort = 1919
 
 class clientError(Exception):
@@ -52,7 +53,8 @@ class CLIENTCORE():
         self.orderThread.setDaemon(True)
         self.orderThread.start()
         # 通话服务器设置
-        self.audioServer = AUDIOSERVER(socket.gethostbyname(socket.gethostname()), self)
+        # self.audioServer = AUDIOSERVER(socket.gethostbyname(socket.gethostname()), self)
+        self.audioServer = AUDIOSERVER('192.168.43.205', self)
         # 其他变量
         self.registerID = ''
         self.ID = ''
@@ -281,7 +283,9 @@ class CLIENTCORE():
                     self.messageQueue.put(string)
                 else:
                     successRecv = True
-            
+            if stringList == 'True':
+                self.messageQueue.put('CallingEnd')
+                self.messageQueue.set()
             return (stringList[1] == 'True')
         except Exception:
             return False

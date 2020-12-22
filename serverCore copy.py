@@ -542,8 +542,6 @@ class LINKLIST(object):
                             userList.getWaitingTarget(self.__userID))
                         # 发送关闭指令
                         userList.sendMessageToUser(
-                            self.__userID, 'CallingEnd$')
-                        userList.sendMessageToUser(
                             userList.getWaitingTarget(self.__userID), 'CallingEnd$')
                         # 消除通话对象
                         targetID = userList.getWaitingTarget(self.__userID)
