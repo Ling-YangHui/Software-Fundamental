@@ -6,8 +6,10 @@ import pyaudio
 class AudioError(Exception):
     def __init__(self, error):
         self.error = error
+
     def __str__(self, *args, **kwargs):
         return self.error
+
 
 class AUDIOSERVER:
 
@@ -28,15 +30,15 @@ class AUDIOSERVER:
         self.connect, address = self.audioServer.accept()
         self.pyAU = pyaudio.PyAudio()
         self.audioInputStream = self.pyAU.open(format=self.FORMAT,
-                                          channels=self.CHANNELS,
-                                          rate=self.RATE,
-                                          input=True,
-                                          frames_per_buffer=self.CHUNK)
+                                               channels=self.CHANNELS,
+                                               rate=self.RATE,
+                                               input=True,
+                                               frames_per_buffer=self.CHUNK)
         self.audioOutputStream = self.pyAU.open(format=self.FORMAT,
-                                          channels=self.CHANNELS,
-                                          rate=self.RATE,
-                                          output=True,
-                                          frames_per_buffer=self.CHUNK)
+                                                channels=self.CHANNELS,
+                                                rate=self.RATE,
+                                                output=True,
+                                                frames_per_buffer=self.CHUNK)
 
         self.audioInThread = threading.Thread(target=self.collectAudio)
         self.audioInThread.setDaemon(True)
@@ -64,7 +66,6 @@ class AUDIOSERVER:
         except AudioError:
             self.audioInputStream.close()
             return
-            
 
     def playAudio(self):
         try:
@@ -90,6 +91,7 @@ class AUDIOSERVER:
             self.pyAU.terminate()
             return
 
+
 class AUDIOCLIENT:
 
     CHUNK = 1024
@@ -104,15 +106,15 @@ class AUDIOCLIENT:
         self.audioClient.connect((IP, port))
         self.pyAU = pyaudio.PyAudio()
         self.audioInputStream = self.pyAU.open(format=self.FORMAT,
-                                          channels=self.CHANNELS,
-                                          rate=self.RATE,
-                                          input=True,
-                                          frames_per_buffer=self.CHUNK)
+                                               channels=self.CHANNELS,
+                                               rate=self.RATE,
+                                               input=True,
+                                               frames_per_buffer=self.CHUNK)
         self.audioOutputStream = self.pyAU.open(format=self.FORMAT,
-                                          channels=self.CHANNELS,
-                                          rate=self.RATE,
-                                          output=True,
-                                          frames_per_buffer=self.CHUNK)
+                                                channels=self.CHANNELS,
+                                                rate=self.RATE,
+                                                output=True,
+                                                frames_per_buffer=self.CHUNK)
 
         self.breakFlag = False
 
@@ -166,4 +168,3 @@ class AUDIOCLIENT:
             self.connect.shutdown(socket.SHUT_RDWR)
             self.pyAU.terminate()
             return
-        

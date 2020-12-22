@@ -8,17 +8,19 @@ from main_ui import *
 from PyQt5.Qt import QMessageBox
 # from groupchat import *
 
-class Main(QtWidgets.QWidget,Main_Ui_Form):
-    #初始化
-    messageSignal = QtCore.pyqtSignal(str) # 消息信号槽
-    groupRefreshSignal = QtCore.pyqtSignal(str) # 群组信号槽
-    askCallingSignal = QtCore.pyqtSignal(str) # 电话请求信号槽
-    showCallingSignal = QtCore.pyqtSignal(str) # 电话接通信号槽
-    def __init__(self,client,parent = None):
-        super(Main,self).__init__(parent)
+
+class Main(QtWidgets.QWidget, Main_Ui_Form):
+    # 初始化
+    messageSignal = QtCore.pyqtSignal(str)  # 消息信号槽
+    groupRefreshSignal = QtCore.pyqtSignal(str)  # 群组信号槽
+    askCallingSignal = QtCore.pyqtSignal(str)  # 电话请求信号槽
+    showCallingSignal = QtCore.pyqtSignal(str)  # 电话接通信号槽
+
+    def __init__(self, client, parent=None):
+        super(Main, self).__init__(parent)
         self.setupUi(self)
         self.groupChatWidgetList = []
-        self.clientCore:CLIENTCORE
+        self.clientCore: CLIENTCORE
         self.clientCore = client
         self.buildGroupButton.clicked.connect(self.buildGroupRequest)
         self.addGroupButton.clicked.connect(self.addGroupRequest)
@@ -36,7 +38,8 @@ class Main(QtWidgets.QWidget,Main_Ui_Form):
         self.nowChosenGroup = 0
         self.isCalling = False
 
-        self.getMessageThread = threading.Thread(target=self.getMessageFromCore)
+        self.getMessageThread = threading.Thread(
+            target=self.getMessageFromCore)
         self.getMessageThread.setDaemon(True)
         self.getMessageThread.start()
 
@@ -52,7 +55,7 @@ class Main(QtWidgets.QWidget,Main_Ui_Form):
         self.userNameLabel.setText(self.clientCore.userName)
         self.userIDLabel.setText(self.clientCore.ID)
 
-    #创建群聊窗口实体
+    # 创建群聊窗口实体
     # def createGroupList(self):
     #     for group in self.clientCore.groupList:
     #         newGroupChatWidget = GroupChat(self.clientCore,group.groupName,group.groupID)
@@ -63,16 +66,19 @@ class Main(QtWidgets.QWidget,Main_Ui_Form):
             self.clientCore.sendToFrontEvent.wait()
             try:
                 while not self.clientCore.sendToFrontQueue.empty():
-                    string:str
+                    string: str
                     string = self.clientCore.sendToFrontQueue.get()
                     if string.find('GroupMessage') != -1:
-                        messageList = string.split('$',5)
-                        group = str(messageList[2]) + ' (' + str(messageList[1]) + ')'
+                        messageList = string.split('$', 5)
+                        group = str(messageList[2]) + \
+                            ' (' + str(messageList[1]) + ')'
                         index = self.groupListStr.index(group)
                         if index == self.nowChosenGroup:
-                            self.messageSignal.emit("{}  {} :\n{}".format(messageList[3],  datetime.datetime.now().strftime('%F-%T'),messageList[4]))
-                        self.groupMessage[index].append("{}  {} :\n{}".format(messageList[3], datetime.datetime.now().strftime('%F-%T'),messageList[4]))
-                    
+                            self.messageSignal.emit("{}  {} :\n{}".format(
+                                messageList[3],  datetime.datetime.now().strftime('%F-%T'), messageList[4]))
+                        self.groupMessage[index].append("{}  {} :\n{}".format(
+                            messageList[3], datetime.datetime.now().strftime('%F-%T'), messageList[4]))
+
                     if string == 'UserGroupListRefresh':
                         for index in self.clientCore.groupList:
                             group = str(index[1]) + ' (' + str(index[0]) + ')'
@@ -94,10 +100,11 @@ class Main(QtWidgets.QWidget,Main_Ui_Form):
                 self.clientCore.sendToFrontEvent.clear()
             except Exception:
                 continue
-                
+
     def showCalling(self, string):
         if string == 'open':
-            self.p2pCallingRequestLine.setText(self.clientCore.requireCallingTarget + ' 通话中')
+            self.p2pCallingRequestLine.setText(
+                self.clientCore.requireCallingTarget + ' 通话中')
             self.isCalling = True
             self.sendOrCloseP2PButton.setText('关闭')
             self.p2pCallingRequestLine.setReadOnly(False)
@@ -107,13 +114,13 @@ class Main(QtWidgets.QWidget,Main_Ui_Form):
             self.sendOrCloseP2PButton.setText('开始')
             self.p2pCallingRequestLine.setReadOnly(False)
 
-
     def beAskedCalling(self, string):
-        askCallingBox = QMessageBox(QMessageBox.Critical, '通信请求', self.clientCore.requireCallingTarget+ ' 请求通话', QMessageBox.NoButton, self)
+        askCallingBox = QMessageBox(
+            QMessageBox.Critical, '通信请求', self.clientCore.requireCallingTarget + ' 请求通话', QMessageBox.NoButton, self)
         acceptButton = askCallingBox.addButton('接受', QMessageBox.YesRole)
         refuseButton = askCallingBox.addButton('拒绝', QMessageBox.YesRole)
         askCallingBox.setIcon(1)
-        askCallingBox.setGeometry(900,500,0,0)
+        askCallingBox.setGeometry(900, 500, 0, 0)
         acceptButton.clicked.connect(self.clientCore.receiveCalling)
         acceptButton.clicked.connect(askCallingBox.close)
         refuseButton.clicked.connect(self.clientCore.refuseCalling)
@@ -130,7 +137,7 @@ class Main(QtWidgets.QWidget,Main_Ui_Form):
                 self.buildGroupLine.clear()
             except Exception:
                 self.remindLine.setText("建群失败，请重试！")
-    
+
     def addGroupRequest(self):
         if self.addGroupLine.text() != '':
             try:
@@ -144,12 +151,12 @@ class Main(QtWidgets.QWidget,Main_Ui_Form):
                 self.addGroupLine.clear()
             except Exception:
                 self.remindLine.setText("加群失败，请检查群组ID后重试！")
-    
+
     def inviteAddGroup(self):
         if self.inviteFriendLine.text() != '':
             try:
-                friendID:str = self.inviteFriendLine.text()
-                groupID:str = self.inviteGroupLine.text()
+                friendID: str = self.inviteFriendLine.text()
+                groupID: str = self.inviteGroupLine.text()
                 if groupID == '':
                     groupID = self.clientCore.groupList[self.nowChosenGroup][0]
                 if friendID.isdigit() == False or groupID.isdigit() == False:
@@ -168,10 +175,11 @@ class Main(QtWidgets.QWidget,Main_Ui_Form):
         print(1)
         if self.p2pCallingRequestLine.text() != '' and self.p2pCallingRequestLine.text().isdigit() and self.isCalling == False:
             if self.clientCore.requireCalling(self.p2pCallingRequestLine.text()):
-               self.p2pCallingRequestLine.setText("正在与{}进行通话".format(self.p2pCallingRequestLine.text()))
-               self.p2pCallingRequestLine.setReadOnly(True)
-               self.sendOrCloseP2PButton.setText("关闭")
-               self.isCalling = True
+                self.p2pCallingRequestLine.setText(
+                    "{} 通话中".format(self.p2pCallingRequestLine.text()))
+                self.p2pCallingRequestLine.setReadOnly(True)
+                self.sendOrCloseP2PButton.setText("关闭")
+                self.isCalling = True
         elif self.isCalling == True:
             if self.clientCore.closeCalling():
                 self.p2pCallingRequestLine.clear()
@@ -179,23 +187,24 @@ class Main(QtWidgets.QWidget,Main_Ui_Form):
                 self.sendOrCloseP2PButton.setText("开始")
                 self.isCalling = False
 
-            
     def sendP2PMessage(self):
-        #toPlainText()方法可以获取当前文本编辑器内的多行文本
+        # toPlainText()方法可以获取当前文本编辑器内的多行文本
         if self.sendMessageText.toPlainText() != '':
             # //此处添加发送信息代码
             if True:
-                self.clientCore.sendMessage(self.sendMessageText.toPlainText(), self.clientCore.groupList[self.nowChosenGroup][0])
+                self.clientCore.sendMessage(self.sendMessageText.toPlainText(
+                ), self.clientCore.groupList[self.nowChosenGroup][0])
                 self.sendMessageText.clear()
 
     def showP2PMessage(self, Name, ID, message):
-        self.showTextBrowser.append("{}({})  {} :\n{}".format(Name, ID, datetime.datetime.now().strftime('%F-%T'),message))
+        self.showTextBrowser.append("{}({})  {} :\n{}".format(
+            Name, ID, datetime.datetime.now().strftime('%F-%T'), message))
 
     # 槽函数
     def groupListWidgetCmd(self, groupList):
         self.groupListWidget.clear()
         self.groupListWidget.addItems(self.groupListStr)
-        
+
     def showMessage(self, message):
         self.showTextBrowser.append(message)
 
@@ -210,7 +219,6 @@ class Main(QtWidgets.QWidget,Main_Ui_Form):
         for i in self.groupMessage[self.nowChosenGroup]:
             self.showMessage(i)
 
-    
     # def sendP2PAudioRequest(self):
 
     # def sendP2PVideoRequest(self):
@@ -218,7 +226,7 @@ class Main(QtWidgets.QWidget,Main_Ui_Form):
     # def sendP2PFileRequest(self):
     #     if self.fileAddressLine != '':
     #         if True:
-    
+
 
 # if __name__ == "__main__":
 #     app = QApplication(sys.argv)

@@ -2,7 +2,7 @@ import socket
 import threading
 import time
 import queue
-from audioCore import AUDIOSERVER,AUDIOCLIENT
+from audioCore import AUDIOSERVER, AUDIOCLIENT
 
 serverIP = '127.0.0.1'
 # serverIP = '192.168.43.205'
@@ -10,11 +10,14 @@ serverPort = 1919
 audioPort = 8087
 connectPort = 8086
 
+
 class clientError(Exception):
     def __init__(self, error):
         self.error = error
+
     def __str__(self, *args, **kwargs):
         return self.error
+
 
 class heartBeatPackage():
     def __init__(self, socketTarget):
@@ -33,6 +36,7 @@ class heartBeatPackage():
                 self.socketTarget.send(bytes(1))
                 time.sleep(8)
 
+
 class CLIENTCORE():
 
     def __init__(self):
@@ -40,7 +44,8 @@ class CLIENTCORE():
         self.link.connect((serverIP, serverPort))
         # 启动心跳包
         self.heartBeat = heartBeatPackage(self.link)
-        self.heartBeatThread = threading.Thread(target=self.heartBeat.sendTarget)
+        self.heartBeatThread = threading.Thread(
+            target=self.heartBeat.sendTarget)
         self.heartBeatThread.setDaemon(True)
         self.heartBeatThread.start()
         # 消息队列线程
@@ -55,7 +60,8 @@ class CLIENTCORE():
         self.orderThread.setDaemon(True)
         self.orderThread.start()
         # 通话服务器设置
-        self.audioServer = AUDIOSERVER(socket.gethostbyname(socket.gethostname()), self, audioPort)
+        self.audioServer = AUDIOSERVER(socket.gethostbyname(
+            socket.gethostname()), self, audioPort)
         # self.audioServer = AUDIOSERVER('192.168.43.205', self)
         # 其他变量
         self.registerID = ''
@@ -67,7 +73,7 @@ class CLIENTCORE():
         self.requireCallingTarget = ''
         self.callingIP = ''
         self.callingPos = 'slave'
-        
+
     def waitString(self):
         while True:
             string = self.link.recv(65536).decode('utf8')
@@ -87,15 +93,16 @@ class CLIENTCORE():
                         self.requireCallingTarget = stringList[1]
                         self.sendToFrontQueue.put('AskingCalling')
                         self.sendToFrontEvent.set()
-                        self.callingPos = 'slave' # 服务器
+                        self.callingPos = 'slave'  # 服务器
                         self.audioServer.breakFlag = False
 
                     elif stringList[0] == 'ReceiveCallingIP':
                         self.callingIP = stringList[1]
-                        self.audioClient = AUDIOCLIENT(self.callingIP, connectPort, self)
+                        self.audioClient = AUDIOCLIENT(
+                            self.callingIP, connectPort, self)
                         self.sendToFrontQueue.put('ReceiveCalling')
                         self.sendToFrontEvent.set()
-                        self.callingPos = 'master' # 客户端
+                        self.callingPos = 'master'  # 客户端
                         self.audioClient.breakFlag = False
 
                     elif stringList[0] == 'PassRefuseCalling':
@@ -152,13 +159,13 @@ class CLIENTCORE():
             successRecv = False
             self.link.send('RefreshGroupList$'.encode('utf8'))
             while not successRecv:
-                string = self.messageQueue.get(True,timeout=5)
+                string = self.messageQueue.get(True, timeout=5)
                 stringList = string.split('$')
                 if stringList[0] != 'UserGroupList':
                     self.messageQueue.put(string)
                 else:
                     successRecv = True
-                
+
             for i in range(1, len(stringList)):
                 cache = stringList[i].split('%')
                 if (not (cache in self.groupList)) and (cache != ['']):
@@ -170,11 +177,12 @@ class CLIENTCORE():
 
     def login(self, ID, psd, ipAddr):
         try:
-            self.link.send(('LoginRequest$' + ID + '$' +psd + '$' + ipAddr).encode('utf8'))
+            self.link.send(('LoginRequest$' + ID + '$' +
+                            psd + '$' + ipAddr).encode('utf8'))
             loginSuccess = False
             successRecv = False
             while not successRecv:
-                string = self.messageQueue.get(True,timeout=5)
+                string = self.messageQueue.get(True, timeout=5)
                 stringList = string.split('$')
                 if stringList[0] != 'LoginRequest':
                     self.messageQueue.put(string)
@@ -191,17 +199,18 @@ class CLIENTCORE():
 
     def register(self, ID, psd):
         try:
-            self.link.send(('RegisterRequest$' + ID + '$' + psd).encode('utf8'))
+            self.link.send(
+                ('RegisterRequest$' + ID + '$' + psd).encode('utf8'))
             registerSuccess = False
             successRecv = False
             while not successRecv:
-                string = self.messageQueue.get(True,timeout=5)
+                string = self.messageQueue.get(True, timeout=5)
                 stringList = string.split('$')
                 if stringList[0] != 'RegisterRequest':
                     self.messageQueue.put(string)
                 else:
                     successRecv = True
-                
+
             if stringList[1] == 'True':
                 registerSuccess = True
             return registerSuccess
@@ -210,7 +219,8 @@ class CLIENTCORE():
 
     def sendMessage(self, message, groupID):
         try:
-            self.link.send(('SendMessage$' + groupID +'$' + message).encode('utf8'))
+            self.link.send(('SendMessage$' + groupID +
+                            '$' + message).encode('utf8'))
             successRecv = False
             while not successRecv:
                 string = self.messageQueue.get(True, timeout=2)
@@ -219,7 +229,7 @@ class CLIENTCORE():
                     self.messageQueue.put(string)
                 else:
                     successRecv = True
-            
+
             return (stringList[1] == 'True')
         except Exception:
             return False
@@ -229,7 +239,7 @@ class CLIENTCORE():
             self.link.send(('BuildGroup$' + groupName).encode('utf8'))
             successRecv = False
             while not successRecv:
-                string = self.messageQueue.get(True,timeout=5)
+                string = self.messageQueue.get(True, timeout=5)
                 stringList = string.split('$')
                 if stringList[0] != 'BuildGroup':
                     self.messageQueue.put(string)
@@ -238,7 +248,7 @@ class CLIENTCORE():
             successRecv = False
             if stringList[1] == 'True':
                 while not successRecv:
-                    string = self.newBuildGroupQueue.get(True,timeout=5)
+                    string = self.newBuildGroupQueue.get(True, timeout=5)
                     self.addGroup(self.ID, string)
                     successRecv = True
             return (stringList[1] == 'True')
@@ -247,10 +257,11 @@ class CLIENTCORE():
 
     def addGroup(self, userID, groupID):
         try:
-            self.link.send(('AddGroup$' + groupID + '$' + userID).encode('utf8'))
+            self.link.send(
+                ('AddGroup$' + groupID + '$' + userID).encode('utf8'))
             successRecv = False
             while not successRecv:
-                string = self.messageQueue.get(True,timeout=5)
+                string = self.messageQueue.get(True, timeout=5)
                 stringList = string.split('$')
                 if stringList[0] != 'AddGroup':
                     self.messageQueue.put(string)
@@ -269,13 +280,13 @@ class CLIENTCORE():
             self.requireCallingTarget = targetID
             successRecv = False
             while not successRecv:
-                string = self.messageQueue.get(True,timeout=5)
+                string = self.messageQueue.get(True, timeout=5)
                 stringList = string.split('$')
                 if stringList[0] != 'RequireCalling':
                     self.messageQueue.put(string)
                 else:
                     successRecv = True
-            
+
             return (stringList[1] == 'True')
         except Exception:
             return False
@@ -301,19 +312,19 @@ class CLIENTCORE():
             return (stringList[1] == 'True')
         except Exception:
             return False
-        
+
     def receiveCalling(self):
         try:
             self.link.send('ReceiveCalling'.encode('utf8'))
             successRecv = False
             while not successRecv:
-                string = self.messageQueue.get(True,timeout=5)
+                string = self.messageQueue.get(True, timeout=5)
                 stringList = string.split('$')
                 if stringList[0] != 'ReceiveCalling':
                     self.messageQueue.put(string)
                 else:
                     successRecv = True
-            
+
             if stringList[1] == 'True':
                 self.audioServer.startAudio()
                 self.sendToFrontQueue.put('ReceiveCalling')
@@ -334,7 +345,7 @@ class CLIENTCORE():
                     self.messageQueue.put(string)
                 else:
                     successRecv = True
-            
+
             return (stringList[1] == 'True')
         except Exception:
             return False
