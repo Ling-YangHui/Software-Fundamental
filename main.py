@@ -114,6 +114,13 @@ class Main(QtWidgets.QWidget, Main_Ui_Form):
             self.sendOrCloseP2PButton.setText('开始')
             self.p2pCallingRequestLine.setReadOnly(False)
 
+            closeCallingBox = QMessageBox(QMessageBox.Critical, ' ', '通话结束', QMessageBox.NoButton, self)
+            okButton = closeCallingBox.addButton('OK', QMessageBox.YesRole)
+            closeCallingBox.setIcon(1)
+            closeCallingBox.setGeometry(900,500,0,0)
+            okButton.clicked.connect(closeCallingBox.close)
+            closeCallingBox.show()
+
     def beAskedCalling(self, string):
         askCallingBox = QMessageBox(
             QMessageBox.Critical, '通信请求', self.clientCore.requireCallingTarget + ' 请求通话', QMessageBox.NoButton, self)
