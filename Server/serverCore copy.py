@@ -582,8 +582,7 @@ class LINKLIST(object):
                             userList.setWaitingFile(targetID, self.__userID)
                             userList.setOnFiling(targetID)
                             userList.setOnFiling(self.__userID)
-                            userList.sendMessageToUser(
-                                targetID, 'FileSending$' + str(userList.ID2LoginID(self.__userID)))
+                            userList.sendMessageToUser(self.__userID, 'FileSending$' + userList.getP2PIP(targetID))
 
                     elif orderList[0] == 'FileSendingClose' and self.__userID != -1:
                         # 关闭占线状态
@@ -599,26 +598,6 @@ class LINKLIST(object):
                         targetID = userList.getWaitingFileTarget(self.__userID)
                         userList.setWaitingFile(self.__userID, -1)
                         userList.setWaitingFile(targetID, -1)
-                        self.sendTrue('FileSendingClose')
-
-                    elif orderList[0] == 'RefuseFileSending' and self.__userID != -1:
-                        # 关闭双方占线状态
-                        userList.setOffFiling(self.__userID)
-                        userList.setOffFiling(
-                            userList.getWaitingTarget(self.__userID))
-                        # 发送拒绝代码
-                        userList.sendMessageToUser(userList.getWaitingTarget(
-                            self.__userID), 'RefuseFileSending$')
-                        # 消除通话对象
-                        targetID = userList.getWaitingFileTarget(self.__userID)
-                        userList.setWaitingFile(self.__userID, -1)
-                        userList.setWaitingFile(targetID, -1)
-                        self.sendTrue('RefuseFileSending')
-
-                    elif orderList[0] == 'ReceiveFileSending' and self.__userID != -1:
-                        userList.sendMessageToUser(userList.getWaitingFileTarget(
-                            self.__userID), 'ReceiveFileSending$' + userList.getP2PIP(self.__userID))
-                        self.sendTrue('ReceiveFileSending')
 
                 # 连接出现错误
                 except socket.timeout:
@@ -722,7 +701,8 @@ class JSONLIST(object):
 
 
 # 监听初始化
-IP = '127.0.0.1'
+# IP = '127.0.0.1'
+IP = '192.168.43.205'
 port = 1919
 
 SOC = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  # 设置socket模式

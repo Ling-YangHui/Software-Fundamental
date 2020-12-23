@@ -4,8 +4,8 @@ import time
 import queue
 from audioCore import AUDIOSERVER, AUDIOCLIENT
 
-serverIP = '127.0.0.1'
-# serverIP = '192.168.43.205'
+# serverIP = '127.0.0.1'
+serverIP = '192.168.43.205'
 serverPort = 1919
 audioPort = 8087
 connectPort = 8086
