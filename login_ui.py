@@ -8,6 +8,7 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtGui import QPalette, QBrush, QPixmap
+import os
 
 class Ui_Form(object):
     def setupUi(self, Form):
@@ -56,7 +57,7 @@ class Ui_Form(object):
 "border-bottom:1px solid #717072;\n"
 "}")
         palette = QPalette()
-        palette.setBrush(QPalette.Background, QBrush(QPixmap('D:/programming/Python/SoftWare_PP/Client/Image/login_background.jpg')))
+        palette.setBrush(QPalette.Background, QBrush(QPixmap(os.getcwd()+'/ClientSource/Image/login_background.jpg')))
         Form.setPalette(palette)
 
         self.Login_Window = QtWidgets.QFrame(Form)

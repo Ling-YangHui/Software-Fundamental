@@ -40,6 +40,8 @@ class heartBeatPackage():
 class CLIENTCORE():
 
     def __init__(self):
+        # self.localIP = socket.gethostbyname(socket.gethostname())
+        self.localIP = '127.0.0.1'
         self.link = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.link.connect((serverIP, serverPort))
         # 启动心跳包
@@ -60,8 +62,7 @@ class CLIENTCORE():
         self.orderThread.setDaemon(True)
         self.orderThread.start()
         # 通话服务器设置
-        self.audioServer = AUDIOSERVER(socket.gethostbyname(
-            socket.gethostname()), self, audioPort)
+        self.audioServer = AUDIOSERVER(self.localIP, self, audioPort)
         # self.audioServer = AUDIOSERVER('192.168.43.205', self)
         # 其他变量
         self.registerID = ''
@@ -159,7 +160,7 @@ class CLIENTCORE():
             successRecv = False
             self.link.send('RefreshGroupList$'.encode('utf8'))
             while not successRecv:
-                string = self.messageQueue.get(True, timeout=5)
+                string = self.messageQueue.get(True, timeout=2)
                 stringList = string.split('$')
                 if stringList[0] != 'UserGroupList':
                     self.messageQueue.put(string)
@@ -182,7 +183,7 @@ class CLIENTCORE():
             loginSuccess = False
             successRecv = False
             while not successRecv:
-                string = self.messageQueue.get(True, timeout=5)
+                string = self.messageQueue.get(True, timeout=2)
                 stringList = string.split('$')
                 if stringList[0] != 'LoginRequest':
                     self.messageQueue.put(string)
@@ -204,7 +205,7 @@ class CLIENTCORE():
             registerSuccess = False
             successRecv = False
             while not successRecv:
-                string = self.messageQueue.get(True, timeout=5)
+                string = self.messageQueue.get(True, timeout=2)
                 stringList = string.split('$')
                 if stringList[0] != 'RegisterRequest':
                     self.messageQueue.put(string)
@@ -239,7 +240,7 @@ class CLIENTCORE():
             self.link.send(('BuildGroup$' + groupName).encode('utf8'))
             successRecv = False
             while not successRecv:
-                string = self.messageQueue.get(True, timeout=5)
+                string = self.messageQueue.get(True, timeout=2)
                 stringList = string.split('$')
                 if stringList[0] != 'BuildGroup':
                     self.messageQueue.put(string)
@@ -248,7 +249,7 @@ class CLIENTCORE():
             successRecv = False
             if stringList[1] == 'True':
                 while not successRecv:
-                    string = self.newBuildGroupQueue.get(True, timeout=5)
+                    string = self.newBuildGroupQueue.get(True, timeout=2)
                     self.addGroup(self.ID, string)
                     successRecv = True
             return (stringList[1] == 'True')
@@ -261,7 +262,7 @@ class CLIENTCORE():
                 ('AddGroup$' + groupID + '$' + userID).encode('utf8'))
             successRecv = False
             while not successRecv:
-                string = self.messageQueue.get(True, timeout=5)
+                string = self.messageQueue.get(True, timeout=2)
                 stringList = string.split('$')
                 if stringList[0] != 'AddGroup':
                     self.messageQueue.put(string)
@@ -280,7 +281,7 @@ class CLIENTCORE():
             self.requireCallingTarget = targetID
             successRecv = False
             while not successRecv:
-                string = self.messageQueue.get(True, timeout=5)
+                string = self.messageQueue.get(True, timeout=2)
                 stringList = string.split('$')
                 if stringList[0] != 'RequireCalling':
                     self.messageQueue.put(string)
@@ -296,7 +297,7 @@ class CLIENTCORE():
             self.link.send('CloseCalling$'.encode('utf8'))
             successRecv = False
             while not successRecv:
-                string = self.messageQueue.get(True, timeout=5)
+                string = self.messageQueue.get(True, timeout=2)
                 stringList = string.split('$')
                 if stringList[0] != 'CloseCalling':
                     self.messageQueue.put(string)
@@ -318,7 +319,7 @@ class CLIENTCORE():
             self.link.send('ReceiveCalling'.encode('utf8'))
             successRecv = False
             while not successRecv:
-                string = self.messageQueue.get(True, timeout=5)
+                string = self.messageQueue.get(True, timeout=2)
                 stringList = string.split('$')
                 if stringList[0] != 'ReceiveCalling':
                     self.messageQueue.put(string)
@@ -339,7 +340,7 @@ class CLIENTCORE():
             self.link.send('RefuseCalling$'.encode('utf8'))
             successRecv = False
             while not successRecv:
-                string = self.messageQueue.get(True, timeout=5)
+                string = self.messageQueue.get(True, timeout=2)
                 stringList = string.split('$')
                 if stringList[0] != 'RefuseCalling':
                     self.messageQueue.put(string)

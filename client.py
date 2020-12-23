@@ -11,6 +11,6 @@ if __name__ == "__main__":
 
 '''
     D:
-    cd "D://programming//python//softWare_PP"
+    cd "D://programming//python//softWare_PP//Server"
     python -u "serverCore copy.py"
 '''

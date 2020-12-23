@@ -88,6 +88,7 @@ class AUDIOSERVER:
             self.audioOutputStream.close()
             self.audioInThread.join()
             self.connect.shutdown(socket.SHUT_RDWR)
+            self.connect.close()
             self.pyAU.terminate()
             return
 
@@ -165,6 +166,7 @@ class AUDIOCLIENT:
         except AudioError:
             self.audioOutputStream.close()
             self.audioInThread.join()
-            self.connect.shutdown(socket.SHUT_RDWR)
+            self.audioClient.shutdown(socket.SHUT_RDWR)
+            self.audioClient.close()
             self.pyAU.terminate()
             return
