@@ -5,18 +5,18 @@ import queue
 from audioCore import AUDIOSERVER, AUDIOCLIENT
 from fileCore import FILECLIENT, FILESERVER
 
-serverIP = '127.0.0.1'
-# serverIP = '192.168.43.205'
+# serverIP = '127.0.0.1'
+serverIP = '192.168.43.205'
 serverPort = 1919
 audioPort = 8087
 audioConnectPort = 8086
 filePort = 8088
-fileConnectPort = 8089
-
-audioPort = 8086
-audioConnectPort = 8087
-filePort = 8089
 fileConnectPort = 8088
+
+# audioPort = 8086
+# audioConnectPort = 8087
+# filePort = 8089
+# fileConnectPort = 8088
 
 
 class clientError(Exception):
@@ -49,7 +49,7 @@ class CLIENTCORE():
 
     def __init__(self):
         # self.localIP = socket.gethostbyname(socket.gethostname())
-        self.localIP = '127.0.0.1'
+        self.localIP = '192.168.43.205'
         self.link = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.link.connect((serverIP, serverPort))
         # 启动心跳包
@@ -150,6 +150,9 @@ class CLIENTCORE():
                         self.link.send('FileSendingClose'.encode('utf8'))
                     
                     elif stringList[0] == 'PassFileSending':
+                        self.fileTarget = stringList[1]
+                        self.sendToFrontQueue.put('PassFileSending')
+                        self.sendToFrontEvent.set()
                         self.fileServer.starFile()
 
                     elif stringList[0] == 'UserName':

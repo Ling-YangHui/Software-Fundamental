@@ -16,6 +16,7 @@ class Main(QtWidgets.QWidget, Main_Ui_Form):
     askCallingSignal = QtCore.pyqtSignal(str)  # 电话请求信号槽
     showCallingSignal = QtCore.pyqtSignal(str)  # 电话接通信号槽
     showWarningSignal = QtCore.pyqtSignal(str)
+    unlockP2PLineSignal = QtCore.pyqtSignal(str)
 
     def __init__(self, client, parent=None):
         super(Main, self).__init__(parent)
@@ -50,6 +51,7 @@ class Main(QtWidgets.QWidget, Main_Ui_Form):
         self.askCallingSignal.connect(self.beAskedCalling)
         self.showCallingSignal.connect(self.showCalling)
         self.showWarningSignal.connect(self.showWarningWin)
+        self.unlockP2PLineSignal.connect(self.unlockP2PLine)
 
         self.groupListWidget.doubleClicked.connect(self.changeGroup)
         # self.groupListWidget.clicked.connect(self.changeGroup)
@@ -101,8 +103,12 @@ class Main(QtWidgets.QWidget, Main_Ui_Form):
 
                     if string == 'PassRefuseCalling':
                         self.showCallingSignal.emit('refuse')
+
+                    if string == 'PassFileSending':
+                        self.showWarningSignal.emit(str(self.clientCore.fileTarget) + '正在对你发送文件')
                     
                     if string == 'FileEnd':
+                        self.unlockP2PLineSignal.emit('trig')
                         self.showWarningSignal.emit('发送结束')
 
                 self.clientCore.sendToFrontEvent.clear()
@@ -266,6 +272,8 @@ class Main(QtWidgets.QWidget, Main_Ui_Form):
         okButton.clicked.connect(closeBox.close)
         closeBox.show()
 
+    def unlockP2PLine(self, string):
+        self.p2pCallingRequestLine.setReadOnly(False)
 
 # if __name__ == "__main__":
 #     app = QApplication(sys.argv)
