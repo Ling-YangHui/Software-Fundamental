@@ -27,7 +27,18 @@ class FILESERVER:
             self.jsonString = self.connect.recv(2048)
             self.jsonDictionary = json.loads(self.jsonString.decode())
             #编写新文件绝对路径
+            path = os.path.join(self.storePath,self.jsonDictionary["name"])
             self.filePath = os.path.join(self.storePath,self.jsonDictionary["name"])
+            isNewFile = False
+            num = 1
+            while not isNewFile:
+                try:
+                    file = open(self.filePath, 'r')
+                except Exception:
+                    isNewFile = True
+                if isNewFile == False:
+                    self.filePath = path + '(' + str(num) + ')'
+                    num += 1
             #向客户端发送可以接收文件内容的信号
             self.connect.send("Ture".encode())
             with open(self.filePath,'wb') as file:
@@ -38,9 +49,13 @@ class FILESERVER:
         except Exception as E:
             self.clientCore.messageQueue.put('FileEnd')
             self.clientCore.messageEvent.set()
+            self.connect.shutdown(socket.SHUT_RDWR)
+            self.connect.close()
             print(E)
             return
 
+        self.connect.shutdown(socket.SHUT_RDWR)
+        self.connect.close()
         self.clientCore.messageQueue.put('FileEnd')
         self.clientCore.messageEvent.set()
         
@@ -79,8 +94,12 @@ class FILECLIENT:
         except Exception as E:
             self.clientCore.messageQueue.put('FileEnd')
             self.clientCore.messageEvent.set()
+            self.fileClient.shutdown(socket.SHUT_RDWR)
+            self.fileClient.close()
             print(E)
             return
 
+        self.fileClient.shutdown(socket.SHUT_RDWR)
+        self.fileClient.close()
         self.clientCore.messageQueue.put('FileEnd')
         self.clientCore.messageEvent.set()

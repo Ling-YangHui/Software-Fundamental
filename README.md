@@ -29,6 +29,8 @@ connectPort = 8087
 
 Version:
 
+2.2.0 beta 加入了文件传输
+
 2.1.1 release 取消了文件发送的双方确认机制
 
 2.1.0 release 解决了语音聊天机制中的退出bug，GUI界面的人性化方面进行改良

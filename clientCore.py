@@ -5,13 +5,18 @@ import queue
 from audioCore import AUDIOSERVER, AUDIOCLIENT
 from fileCore import FILECLIENT, FILESERVER
 
-# serverIP = '127.0.0.1'
-serverIP = '192.168.43.205'
+serverIP = '127.0.0.1'
+# serverIP = '192.168.43.205'
 serverPort = 1919
 audioPort = 8087
 audioConnectPort = 8086
 filePort = 8088
 fileConnectPort = 8089
+
+audioPort = 8086
+audioConnectPort = 8087
+filePort = 8089
+fileConnectPort = 8088
 
 
 class clientError(Exception):
@@ -142,7 +147,7 @@ class CLIENTCORE():
                         self.fileClient = None
                         self.sendToFrontQueue.put('FileEnd')
                         self.sendToFrontEvent.set()
-                        self.link.send('FileSendingClose')
+                        self.link.send('FileSendingClose'.encode('utf8'))
                     
                     elif stringList[0] == 'PassFileSending':
                         self.fileServer.starFile()
@@ -391,7 +396,8 @@ class CLIENTCORE():
                 return False
             else:
                 self.fileTarget = targetID
-                self.messageQueue.put('FileSendingIP' + stringList[1])
+                self.messageQueue.put('FileSendingIP$' + stringList[1])
+                self.messageEvent.set()
                 return True
         
         except Exception:

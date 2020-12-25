@@ -605,11 +605,25 @@ class LINKLIST(object):
                     print('TimeoutError')
                     if (self.__userID != -1):
                         userList.setOffline(self.__userID)
+                        if userList.getCalling(self.__userID):
+                            userList.setOffCalling(self.__userID)
+                            userList.setOffCalling(userList.getCalling(self.__userID))
+                        if userList.getFiling(self.__userID):
+                            userList.setOffFiling(self.__userID)
+                            userList.setOffFiling(userList.getFiling(self.__userID))
                     nowThread = threading.current_thread()
                     linkList.delLinkThread(nowThread)
                     break
                 except ConnectionResetError:
                     print('ConnectionLose')
+                    if self.__userID != -1:
+                        userList.setOffline(self.__userID)
+                        if userList.getCalling(self.__userID):
+                            userList.setOffCalling(self.__userID)
+                            userList.setOffCalling(userList.getCalling(self.__userID))
+                        if userList.getFiling(self.__userID):
+                            userList.setOffFiling(self.__userID)
+                            userList.setOffFiling(userList.getFiling(self.__userID))
                     nowThread = threading.current_thread()
                     linkList.delLinkThread(nowThread)
                     break
@@ -702,8 +716,8 @@ class JSONLIST(object):
 
 
 # 监听初始化
-# IP = '127.0.0.1'
-IP = '192.168.43.205'
+IP = '127.0.0.1'
+# IP = '192.168.43.205'
 port = 1919
 
 SOC = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  # 设置socket模式
