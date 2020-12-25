@@ -105,8 +105,9 @@ class Main(QtWidgets.QWidget, Main_Ui_Form):
                         self.showCallingSignal.emit('refuse')
 
                     if string == 'PassFileSending':
-                        self.showWarningSignal.emit(str(self.clientCore.fileTarget) + '正在对你发送文件')
-                    
+                        self.showWarningSignal.emit(
+                            str(self.clientCore.fileTarget) + '正在对你发送文件')
+
                     if string == 'FileEnd':
                         self.unlockP2PLineSignal.emit('trig')
                         self.showWarningSignal.emit('发送结束')
@@ -129,7 +130,7 @@ class Main(QtWidgets.QWidget, Main_Ui_Form):
             self.p2pCallingRequestLine.setReadOnly(False)
 
             self.showWarningWin('通话结束')
-        
+
         elif string == 'refuse':
             self.p2pCallingRequestLine.clear()
             self.isCalling = False
@@ -253,7 +254,7 @@ class Main(QtWidgets.QWidget, Main_Ui_Form):
                 self.p2pCallingRequestLine.clear()
                 self.showWarningWin('ID错误')
             try:
-                file = open(self.fileAddressLine.text(),'r')
+                file = open(self.fileAddressLine.text(), 'r')
             except Exception:
                 self.showWarningWin('文件路径不存在')
 
@@ -263,12 +264,13 @@ class Main(QtWidgets.QWidget, Main_Ui_Form):
 
             if self.clientCore.sendFile(filePath, targetID):
                 return
-            
+
     def showWarningWin(self, warning, title=' '):
-        closeBox = QMessageBox(QMessageBox.Critical, title, warning, QMessageBox.NoButton, self)
+        closeBox = QMessageBox(QMessageBox.Critical, title,
+                               warning, QMessageBox.NoButton, self)
         okButton = closeBox.addButton('OK', QMessageBox.YesRole)
         closeBox.setIcon(1)
-        closeBox.setGeometry(900,500,0,0)
+        closeBox.setGeometry(900, 500, 0, 0)
         okButton.clicked.connect(closeBox.close)
         closeBox.show()
 

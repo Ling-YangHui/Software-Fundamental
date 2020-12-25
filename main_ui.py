@@ -6,11 +6,13 @@
 #
 # WARNING! All changes made in this file will be lost!
 
+import image_rc
 from PyQt5 import QtCore, QtGui, QtWidgets
+
 
 class Main_Ui_Form(object):
     def setupUi(self, Form):
-        Form:QtWidgets.QWidget
+        Form: QtWidgets.QWidget
         self.clickedItemStr = ''
         Form.setObjectName("Form")
         Form.resize(1304, 955)
@@ -19,41 +21,42 @@ class Main_Ui_Form(object):
         self.GroupAndUserFrame = QtWidgets.QFrame(Form)
         self.GroupAndUserFrame.setGeometry(QtCore.QRect(90, 30, 431, 891))
         self.GroupAndUserFrame.setStyleSheet("*{\n"
-"font:normal 25px \"微软雅黑\";\n"
-"}\n"
-"#GroupAndUserFrame{\n"
-"/*background:url(:/user/login_background.jpg)*/\n"
-"background:rgb(238, 235, 233);\n"
-"}\n"
-"QLabel\n"
-"{\n"
-"color:black;\n"
-"}\n"
-"QLineEdit\n"
-"{\n"
-"background:transparent;\n"
-"border:none;\n"
-"color:black;\n"
-"border-bottom:1px solid #717072;\n"
-"background-color: rgb(255, 255, 255);\n"
-"}\n"
-"QListWidget\n"
-"{\n"
-"background:transparent;\n"
-"}")
+                                             "font:normal 25px \"微软雅黑\";\n"
+                                             "}\n"
+                                             "#GroupAndUserFrame{\n"
+                                             "/*background:url(:/user/login_background.jpg)*/\n"
+                                             "background:rgb(238, 235, 233);\n"
+                                             "}\n"
+                                             "QLabel\n"
+                                             "{\n"
+                                             "color:black;\n"
+                                             "}\n"
+                                             "QLineEdit\n"
+                                             "{\n"
+                                             "background:transparent;\n"
+                                             "border:none;\n"
+                                             "color:black;\n"
+                                             "border-bottom:1px solid #717072;\n"
+                                             "background-color: rgb(255, 255, 255);\n"
+                                             "}\n"
+                                             "QListWidget\n"
+                                             "{\n"
+                                             "background:transparent;\n"
+                                             "}")
         self.GroupAndUserFrame.setFrameShape(QtWidgets.QFrame.StyledPanel)
         self.GroupAndUserFrame.setFrameShadow(QtWidgets.QFrame.Raised)
         self.GroupAndUserFrame.setObjectName("GroupAndUserFrame")
         self.toolButton = QtWidgets.QToolButton(self.GroupAndUserFrame)
         self.toolButton.setGeometry(QtCore.QRect(20, 30, 71, 71))
         self.toolButton.setStyleSheet("QToolButton\n"
-"{\n"
-"background:red;\n"
-"border-radius:35px;\n"
-"}")
+                                      "{\n"
+                                      "background:red;\n"
+                                      "border-radius:35px;\n"
+                                      "}")
         self.toolButton.setText("")
         icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap(":/user/login.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon.addPixmap(QtGui.QPixmap(":/user/login.png"),
+                       QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.toolButton.setIcon(icon)
         self.toolButton.setIconSize(QtCore.QSize(48, 48))
         self.toolButton.setObjectName("toolButton")
@@ -80,12 +83,13 @@ class Main_Ui_Form(object):
         self.addGroupButton = QtWidgets.QToolButton(self.GroupAndUserFrame)
         self.addGroupButton.setGeometry(QtCore.QRect(110, 120, 41, 31))
         self.addGroupButton.setStyleSheet("QToolButton\n"
-"{\n"
-"background:transparent;\n"
-"}")
+                                          "{\n"
+                                          "background:transparent;\n"
+                                          "}")
         self.addGroupButton.setText("")
         icon1 = QtGui.QIcon()
-        icon1.addPixmap(QtGui.QPixmap(":/user/buildgroup.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon1.addPixmap(QtGui.QPixmap(":/user/buildgroup.png"),
+                        QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.addGroupButton.setIcon(icon1)
         self.addGroupButton.setIconSize(QtCore.QSize(45, 45))
         self.addGroupButton.setObjectName("addGroupButton")
@@ -103,12 +107,13 @@ class Main_Ui_Form(object):
         self.buildGroupButton = QtWidgets.QToolButton(self.GroupAndUserFrame)
         self.buildGroupButton.setGeometry(QtCore.QRect(100, 80, 51, 31))
         self.buildGroupButton.setStyleSheet("QToolButton\n"
-"{\n"
-"background:transparent;\n"
-"}")
+                                            "{\n"
+                                            "background:transparent;\n"
+                                            "}")
         self.buildGroupButton.setText("")
         icon2 = QtGui.QIcon()
-        icon2.addPixmap(QtGui.QPixmap(":/user/addgroup.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon2.addPixmap(QtGui.QPixmap(":/user/addgroup.png"),
+                        QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.buildGroupButton.setIcon(icon2)
         self.buildGroupButton.setIconSize(QtCore.QSize(50, 50))
         self.buildGroupButton.setObjectName("buildGroupButton")
@@ -125,12 +130,13 @@ class Main_Ui_Form(object):
         self.inviteButton = QtWidgets.QToolButton(self.GroupAndUserFrame)
         self.inviteButton.setGeometry(QtCore.QRect(10, 160, 61, 41))
         self.inviteButton.setStyleSheet("QToolButton\n"
-"{\n"
-"background:transparent;\n"
-"}")
+                                        "{\n"
+                                        "background:transparent;\n"
+                                        "}")
         self.inviteButton.setText("")
         icon3 = QtGui.QIcon()
-        icon3.addPixmap(QtGui.QPixmap(":/user/invite.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon3.addPixmap(QtGui.QPixmap(":/user/invite.png"),
+                        QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.inviteButton.setIcon(icon3)
         self.inviteButton.setIconSize(QtCore.QSize(45, 45))
         self.inviteButton.setObjectName("inviteButton")
@@ -143,40 +149,40 @@ class Main_Ui_Form(object):
         self.P2PFrame = QtWidgets.QFrame(Form)
         self.P2PFrame.setGeometry(QtCore.QRect(520, 30, 721, 891))
         self.P2PFrame.setStyleSheet("*{\n"
-"font:normal 25px \"微软雅黑\";\n"
-"}\n"
-"QFrame\n"
-"{\n"
-"background:white;\n"
-"}\n"
-"\n"
-"QLineEdit\n"
-"{\n"
-"border:none;\n"
-"color:black;\n"
-"border-bottom:rgb(153, 153, 153);\n"
-"background-color:rgb(245, 245, 245);\n"
-"border-bottom:1px solid #717072;\n"
-"}\n"
-"QTextBrowser\n"
-"{\n"
-"color:black;\n"
-"background-color:rgb(245, 245, 245);\n"
-"}\n"
-"QPushButton\n"
-"{\n"
-"border:none;\n"
-"color:rgb(116, 116, 116);\n"
-"background:rgb(229, 229, 229);\n"
-"}\n"
-"QTextEdit\n"
-"{\n"
-"border:none;\n"
-"}\n"
-"QToolButton\n"
-"{\n"
-"border:none\n"
-"}")
+                                    "font:normal 25px \"微软雅黑\";\n"
+                                    "}\n"
+                                    "QFrame\n"
+                                    "{\n"
+                                    "background:white;\n"
+                                    "}\n"
+                                    "\n"
+                                    "QLineEdit\n"
+                                    "{\n"
+                                    "border:none;\n"
+                                    "color:black;\n"
+                                    "border-bottom:rgb(153, 153, 153);\n"
+                                    "background-color:rgb(245, 245, 245);\n"
+                                    "border-bottom:1px solid #717072;\n"
+                                    "}\n"
+                                    "QTextBrowser\n"
+                                    "{\n"
+                                    "color:black;\n"
+                                    "background-color:rgb(245, 245, 245);\n"
+                                    "}\n"
+                                    "QPushButton\n"
+                                    "{\n"
+                                    "border:none;\n"
+                                    "color:rgb(116, 116, 116);\n"
+                                    "background:rgb(229, 229, 229);\n"
+                                    "}\n"
+                                    "QTextEdit\n"
+                                    "{\n"
+                                    "border:none;\n"
+                                    "}\n"
+                                    "QToolButton\n"
+                                    "{\n"
+                                    "border:none\n"
+                                    "}")
         self.P2PFrame.setFrameShape(QtWidgets.QFrame.StyledPanel)
         self.P2PFrame.setFrameShadow(QtWidgets.QFrame.Raised)
         self.P2PFrame.setObjectName("P2PFrame")
@@ -206,7 +212,8 @@ class Main_Ui_Form(object):
         self.sendFileButton.setGeometry(QtCore.QRect(10, 660, 51, 41))
         self.sendFileButton.setText("")
         icon4 = QtGui.QIcon()
-        icon4.addPixmap(QtGui.QPixmap(":/user/file.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon4.addPixmap(QtGui.QPixmap(":/user/file.png"),
+                        QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.sendFileButton.setIcon(icon4)
         self.sendFileButton.setIconSize(QtCore.QSize(30, 30))
         self.sendFileButton.setObjectName("sendFileButton")
@@ -215,7 +222,8 @@ class Main_Ui_Form(object):
         self.sendAudioButton.setWhatsThis("")
         self.sendAudioButton.setText("")
         icon5 = QtGui.QIcon()
-        icon5.addPixmap(QtGui.QPixmap(":/user/calling.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon5.addPixmap(QtGui.QPixmap(":/user/calling.png"),
+                        QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.sendAudioButton.setIcon(icon5)
         self.sendAudioButton.setIconSize(QtCore.QSize(30, 30))
         self.sendAudioButton.setObjectName("sendAudioButton")
@@ -223,20 +231,21 @@ class Main_Ui_Form(object):
         self.sendVideoButton.setGeometry(QtCore.QRect(660, 660, 41, 41))
         self.sendVideoButton.setText("")
         icon6 = QtGui.QIcon()
-        icon6.addPixmap(QtGui.QPixmap(":/user/radio.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon6.addPixmap(QtGui.QPixmap(":/user/radio.png"),
+                        QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.sendVideoButton.setIcon(icon6)
         self.sendVideoButton.setIconSize(QtCore.QSize(30, 30))
         self.sendVideoButton.setObjectName("sendVideoButton")
         self.fileAddressLine = QtWidgets.QLineEdit(self.P2PFrame)
         self.fileAddressLine.setGeometry(QtCore.QRect(60, 660, 401, 41))
         self.fileAddressLine.setStyleSheet("QLineEdit\n"
-"{\n"
-"background:transparent;\n"
-"border:none;\n"
-"color:black;\n"
-"border-bottom:1px solid #717072;\n"
-"background-color: rgb(255, 255, 255);\n"
-"}")
+                                           "{\n"
+                                           "background:transparent;\n"
+                                           "border:none;\n"
+                                           "color:black;\n"
+                                           "border-bottom:1px solid #717072;\n"
+                                           "background-color: rgb(255, 255, 255);\n"
+                                           "}")
         self.fileAddressLine.setInputMask("")
         self.fileAddressLine.setText("")
         self.fileAddressLine.setObjectName("fileAddressLine")
@@ -256,17 +265,17 @@ class Main_Ui_Form(object):
         self.remindLine.setPlaceholderText(_translate("Form", "提示消息"))
         self.chosenGroupLine.setPlaceholderText(_translate("Form", "群组名"))
         self.inviteFriendLine.setPlaceholderText(_translate("Form", "输入好友ID"))
-        self.inviteGroupLine.setPlaceholderText(_translate("Form", "输入群聊ID以邀请"))
+        self.inviteGroupLine.setPlaceholderText(
+            _translate("Form", "输入群聊ID以邀请"))
         self.sendMessageText.setHtml(_translate("Form", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
-"<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
-"p, li { white-space: pre-wrap; }\n"
-"</style></head><body style=\" font-family:\'微软雅黑\'; font-size:25px; font-weight:400; font-style:normal;\">\n"
-"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p></body></html>"))
+                                                "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
+                                                "p, li { white-space: pre-wrap; }\n"
+                                                "</style></head><body style=\" font-family:\'微软雅黑\'; font-size:25px; font-weight:400; font-style:normal;\">\n"
+                                                "<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p></body></html>"))
         self.sendMessageButton.setText(_translate("Form", "发送"))
-        self.p2pCallingRequestLine.setPlaceholderText(_translate("Form", "在此处输入好友的ID以快速通话"))
+        self.p2pCallingRequestLine.setPlaceholderText(
+            _translate("Form", "在此处输入好友的ID以快速通话"))
         self.sendAudioButton.setToolTip(_translate("Form", "进行语音通话"))
-        self.fileAddressLine.setPlaceholderText(_translate("Form", "输入文件地址以传输文件"))
+        self.fileAddressLine.setPlaceholderText(
+            _translate("Form", "输入文件地址以传输文件"))
         self.sendOrCloseP2PButton.setText(_translate("Form", "开始"))
-            
-
-import image_rc

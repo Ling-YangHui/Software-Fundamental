@@ -61,7 +61,7 @@ class CLIENTCORE():
         self.orderThread.start()
         # 通话服务器设置
         # self.audioServer = AUDIOSERVER(socket.gethostbyname(
-            # socket.gethostname()), self, audioPort)
+        # socket.gethostname()), self, audioPort)
         # self.audioServer = AUDIOSERVER('192.168.43.205', self)
         # 其他变量
         self.registerID = ''
@@ -356,15 +356,15 @@ while True:
     string = input()
     stringList = string.split('$')
     if stringList[0].find('R') != -1:
-        SOC.register(stringList[1],stringList[2])
+        SOC.register(stringList[1], stringList[2])
     elif stringList[0].find('L') != -1:
-        SOC.login(stringList[1],stringList[2],stringList[3])
+        SOC.login(stringList[1], stringList[2], stringList[3])
     elif stringList[0].find('B') != -1:
         SOC.buildGroup(stringList[1])
     elif stringList[0].find('A') != -1:
         SOC.addGroup(stringList[1], stringList[2])
     elif stringList[0].find('S') != -1:
-        SOC.sendMessage(stringList[1],stringList[2])
+        SOC.sendMessage(stringList[1], stringList[2])
     elif stringList[0].find('P') != -1:
         print(SOC.groupList)
     elif stringList[0].find('I') != -1:

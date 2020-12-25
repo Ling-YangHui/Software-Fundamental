@@ -582,8 +582,10 @@ class LINKLIST(object):
                             userList.setFileWaiting(targetID, self.__userID)
                             userList.setOnFiling(targetID)
                             userList.setOnFiling(self.__userID)
-                            userList.sendMessageToUser(targetID, 'PassFileSending$' + str(userList.ID2LoginID(self.__userID)))
-                            userList.sendMessageToUser(self.__userID, 'FileSending$' + userList.getP2PIP(targetID))
+                            userList.sendMessageToUser(
+                                targetID, 'PassFileSending$' + str(userList.ID2LoginID(self.__userID)))
+                            userList.sendMessageToUser(
+                                self.__userID, 'FileSending$' + userList.getP2PIP(targetID))
 
                     elif orderList[0] == 'FileSendingClose' and self.__userID != -1:
                         # 关闭占线状态
@@ -607,10 +609,12 @@ class LINKLIST(object):
                         userList.setOffline(self.__userID)
                         if userList.getCalling(self.__userID):
                             userList.setOffCalling(self.__userID)
-                            userList.setOffCalling(userList.getCalling(self.__userID))
+                            userList.setOffCalling(
+                                userList.getCalling(self.__userID))
                         if userList.getFiling(self.__userID):
                             userList.setOffFiling(self.__userID)
-                            userList.setOffFiling(userList.getFiling(self.__userID))
+                            userList.setOffFiling(
+                                userList.getFiling(self.__userID))
                     nowThread = threading.current_thread()
                     linkList.delLinkThread(nowThread)
                     break
@@ -620,10 +624,12 @@ class LINKLIST(object):
                         userList.setOffline(self.__userID)
                         if userList.getCalling(self.__userID):
                             userList.setOffCalling(self.__userID)
-                            userList.setOffCalling(userList.getCalling(self.__userID))
+                            userList.setOffCalling(
+                                userList.getCalling(self.__userID))
                         if userList.getFiling(self.__userID):
                             userList.setOffFiling(self.__userID)
-                            userList.setOffFiling(userList.getFiling(self.__userID))
+                            userList.setOffFiling(
+                                userList.getFiling(self.__userID))
                     nowThread = threading.current_thread()
                     linkList.delLinkThread(nowThread)
                     break
@@ -716,8 +722,8 @@ class JSONLIST(object):
 
 
 # 监听初始化
-# IP = '127.0.0.1'
-IP = '192.168.43.205'
+IP = '127.0.0.1'
+# IP = '192.168.43.205'
 port = 1919
 
 SOC = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  # 设置socket模式

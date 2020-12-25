@@ -139,7 +139,8 @@ class CLIENTCORE():
 
                     elif stringList[0] == 'FileSendingIP':
                         self.fileIP = stringList[1]
-                        self.fileClient = FILECLIENT(self.fileIP, fileConnectPort, self.filePath, self)
+                        self.fileClient = FILECLIENT(
+                            self.fileIP, fileConnectPort, self.filePath, self)
 
                     elif stringList[0] == 'FileEnd':
                         self.fileIP = ''
@@ -148,7 +149,7 @@ class CLIENTCORE():
                         self.sendToFrontQueue.put('FileEnd')
                         self.sendToFrontEvent.set()
                         self.link.send('FileSendingClose'.encode('utf8'))
-                    
+
                     elif stringList[0] == 'PassFileSending':
                         self.fileTarget = stringList[1]
                         self.sendToFrontQueue.put('PassFileSending')
@@ -191,7 +192,7 @@ class CLIENTCORE():
             successRecv = False
             self.link.send('RefreshGroupList$'.encode('utf8'))
             while not successRecv:
-                string:str = self.messageQueue.get(True, timeout=2)
+                string: str = self.messageQueue.get(True, timeout=2)
                 stringList = string.split('$')
                 if stringList[0] != 'UserGroupList':
                     self.messageQueue.put(string)
@@ -402,7 +403,7 @@ class CLIENTCORE():
                 self.messageQueue.put('FileSendingIP$' + stringList[1])
                 self.messageEvent.set()
                 return True
-        
+
         except Exception:
             return False
 

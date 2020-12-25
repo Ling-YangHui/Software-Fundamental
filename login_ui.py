@@ -6,58 +6,61 @@
 #
 # WARNING! All changes made in this file will be lost!
 
+import user_rc
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtGui import QPalette, QBrush, QPixmap
 import os
+
 
 class Ui_Form(object):
     def setupUi(self, Form):
         Form.setObjectName("Form")
         Form.resize(936, 660)
-        Form.setFixedSize(936,660)
+        Form.setFixedSize(936, 660)
         Form.setStyleSheet("*\n"
-"{\n"
-"font:normal 25px \"微软雅黑\";\n"
-"}\n"
+                           "{\n"
+                           "font:normal 25px \"微软雅黑\";\n"
+                           "}\n"
 
 
-"QLabel\n"
-"{\n"
-"color:white;\n"
-"text-align: center\n"
-"}\n"
+                           "QLabel\n"
+                           "{\n"
+                           "color:white;\n"
+                           "text-align: center\n"
+                           "}\n"
 
-"QFrame\n"
-"{\n"
-"background:#333\n"
-"}\n"
+                           "QFrame\n"
+                           "{\n"
+                           "background:#333\n"
+                           "}\n"
 
-"QToolButton\n"
-"{\n"
-"background:red;\n"
-"border-radius:45px;\n"
-"}\n"
+                           "QToolButton\n"
+                           "{\n"
+                           "background:red;\n"
+                           "border-radius:45px;\n"
+                           "}\n"
 
-"QPushButton\n"
-"{\n"
-"color:white;\n"
-"background:red;\n"
-"border-radius:15px;\n"
-"}\n"
+                           "QPushButton\n"
+                           "{\n"
+                           "color:white;\n"
+                           "background:red;\n"
+                           "border-radius:15px;\n"
+                           "}\n"
 
-"QPushButton:hover\n"
-"{\n"
-"background:blue;\n"
-"}\n"
+                           "QPushButton:hover\n"
+                           "{\n"
+                           "background:blue;\n"
+                           "}\n"
 
-"QLineEdit{\n"
-"background:transparent;\n"
-"border:none;\n"
-"color:white;\n"
-"border-bottom:1px solid #717072;\n"
-"}")
+                           "QLineEdit{\n"
+                           "background:transparent;\n"
+                           "border:none;\n"
+                           "color:white;\n"
+                           "border-bottom:1px solid #717072;\n"
+                           "}")
         palette = QPalette()
-        palette.setBrush(QPalette.Background, QBrush(QPixmap(os.getcwd()+'/ClientSource/Image/login_background.jpg')))
+        palette.setBrush(QPalette.Background, QBrush(
+            QPixmap(os.getcwd()+'/ClientSource/Image/login_background.jpg')))
         Form.setPalette(palette)
 
         self.Login_Window = QtWidgets.QFrame(Form)
@@ -89,7 +92,8 @@ class Ui_Form(object):
         self.toolButton.setGeometry(QtCore.QRect(430, 110, 91, 91))
         self.toolButton.setText("")
         icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap(":/user/login.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon.addPixmap(QtGui.QPixmap(":/user/login.png"),
+                       QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.toolButton.setIcon(icon)
         self.toolButton.setIconSize(QtCore.QSize(64, 64))
         self.toolButton.setObjectName("toolButton")
@@ -105,5 +109,3 @@ class Ui_Form(object):
         self.Register_Line.setText(_translate("Form", "注册"))
         self.Username_Line.setPlaceholderText(_translate("Form", "注册用户名/登录ID"))
         self.Password_Line.setPlaceholderText(_translate("Form", "密码"))
-
-import user_rc
