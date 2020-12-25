@@ -236,8 +236,8 @@ class USERLIST(object):  # 用户列表类
     def setWaiting(self, ID, targetID):
         return self.__userList[ID].setWaiting(targetID)
 
-    def setWaitingFile(self, ID, targetID):
-        return self.__userList[ID].setWaitingFile(targetID)
+    def setFileWaiting(self, ID, targetID):
+        return self.__userList[ID].setFileWaiting(targetID)
 
     def setOffFiling(self, ID):
         return self.__userList[ID].setFiling(arg='offFiling')
@@ -570,7 +570,7 @@ class LINKLIST(object):
                         self.sendTrue('RefuseCalling')
 
                     elif orderList[0] == 'FileSending' and self.__userID != -1:
-                        targetID = userList.loginID2ID(targetID)
+                        targetID = userList.loginID2ID(int(orderList[1]))
                         if userList.findIDValid(targetID) == False:
                             self.sendFalse('FileSending')
                         if userList.getOnline(targetID) == False:
@@ -578,10 +578,11 @@ class LINKLIST(object):
                         if userList.getFiling(targetID) == True:
                             self.sendFalse('FileSending')
                         else:
-                            userList.setWaitingFile(self.__userID, targetID)
-                            userList.setWaitingFile(targetID, self.__userID)
+                            userList.setFileWaiting(self.__userID, targetID)
+                            userList.setFileWaiting(targetID, self.__userID)
                             userList.setOnFiling(targetID)
                             userList.setOnFiling(self.__userID)
+                            userList.sendMessageToUser(targetID, 'PassFileSending$' + str(userList.ID2LoginID(self.__userID)))
                             userList.sendMessageToUser(self.__userID, 'FileSending$' + userList.getP2PIP(targetID))
 
                     elif orderList[0] == 'FileSendingClose' and self.__userID != -1:
@@ -590,14 +591,14 @@ class LINKLIST(object):
                         userList.setOffFiling(
                             userList.getWaitingFileTarget(self.__userID))
                         # 发送关闭指令
-                        userList.sendMessageToUser(
-                            self.__userID, 'FileSendingClose$')
-                        userList.sendMessageToUser(userList.getWaitingFileTarget(
-                            self.__userID), 'FileSendingClose$')
+                        # userList.sendMessageToUser(
+                        #     self.__userID, 'FileSendingClose$')
+                        # userList.sendMessageToUser(userList.getWaitingFileTarget(
+                        #     self.__userID), 'FileSendingClose$')
                         # 消除通话对象
                         targetID = userList.getWaitingFileTarget(self.__userID)
-                        userList.setWaitingFile(self.__userID, -1)
-                        userList.setWaitingFile(targetID, -1)
+                        userList.setFileWaiting(self.__userID, -1)
+                        userList.setFileWaiting(targetID, -1)
 
                 # 连接出现错误
                 except socket.timeout:

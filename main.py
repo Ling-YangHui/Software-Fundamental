@@ -15,6 +15,7 @@ class Main(QtWidgets.QWidget, Main_Ui_Form):
     groupRefreshSignal = QtCore.pyqtSignal(str)  # 群组信号槽
     askCallingSignal = QtCore.pyqtSignal(str)  # 电话请求信号槽
     showCallingSignal = QtCore.pyqtSignal(str)  # 电话接通信号槽
+    showWarningSignal = QtCore.pyqtSignal(str)
 
     def __init__(self, client, parent=None):
         super(Main, self).__init__(parent)
@@ -30,7 +31,7 @@ class Main(QtWidgets.QWidget, Main_Ui_Form):
 
         # self.sendVideoButton.clicked.connect(self.sendP2PAudioRequest)
         # self.sendAudioButton.clicked.connect(self.sendP2PVideoRequest)
-        # self.sendFileButton.clicked.connect(self.sendP2PFileRequest)
+        self.sendFileButton.clicked.connect(self.sendP2PFileRequest)
         self.groupListStr = []
         self.groupMessage = []
         # 标志
@@ -48,6 +49,7 @@ class Main(QtWidgets.QWidget, Main_Ui_Form):
         self.groupRefreshSignal.connect(self.groupListWidgetCmd)
         self.askCallingSignal.connect(self.beAskedCalling)
         self.showCallingSignal.connect(self.showCalling)
+        self.showWarningSignal.connect(self.showWarningWin)
 
         self.groupListWidget.doubleClicked.connect(self.changeGroup)
         # self.groupListWidget.clicked.connect(self.changeGroup)
@@ -97,6 +99,12 @@ class Main(QtWidgets.QWidget, Main_Ui_Form):
                     if string == 'CallingEnd':
                         self.showCallingSignal.emit('close')
 
+                    if string == 'PassRefuseCalling':
+                        self.showCallingSignal.emit('refuse')
+                    
+                    if string == 'FileEnd':
+                        self.showWarningSignal.emit('发送结束')
+
                 self.clientCore.sendToFrontEvent.clear()
             except Exception:
                 continue
@@ -107,19 +115,22 @@ class Main(QtWidgets.QWidget, Main_Ui_Form):
                 self.clientCore.requireCallingTarget + ' 通话中')
             self.isCalling = True
             self.sendOrCloseP2PButton.setText('关闭')
-            self.p2pCallingRequestLine.setReadOnly(False)
+            self.p2pCallingRequestLine.setReadOnly(True)
         elif string == 'close':
             self.p2pCallingRequestLine.clear()
             self.isCalling = False
             self.sendOrCloseP2PButton.setText('开始')
             self.p2pCallingRequestLine.setReadOnly(False)
 
-            closeCallingBox = QMessageBox(QMessageBox.Critical, ' ', '通话结束', QMessageBox.NoButton, self)
-            okButton = closeCallingBox.addButton('OK', QMessageBox.YesRole)
-            closeCallingBox.setIcon(1)
-            closeCallingBox.setGeometry(900,500,0,0)
-            okButton.clicked.connect(closeCallingBox.close)
-            closeCallingBox.show()
+            self.showWarningWin('通话结束')
+        
+        elif string == 'refuse':
+            self.p2pCallingRequestLine.clear()
+            self.isCalling = False
+            self.sendOrCloseP2PButton.setText('开始')
+            self.p2pCallingRequestLine.setReadOnly(False)
+
+            self.showWarningWin('拒绝通信')
 
     def beAskedCalling(self, string):
         askCallingBox = QMessageBox(
@@ -230,9 +241,30 @@ class Main(QtWidgets.QWidget, Main_Ui_Form):
 
     # def sendP2PVideoRequest(self):
 
-    # def sendP2PFileRequest(self):
-    #     if self.fileAddressLine != '':
-    #         if True:
+    def sendP2PFileRequest(self):
+        if self.fileAddressLine.text() != '' and self.p2pCallingRequestLine.text() != '':
+            if self.p2pCallingRequestLine.text().isdigit() == False:
+                self.p2pCallingRequestLine.clear()
+                self.showWarningWin('ID错误')
+            try:
+                file = open(self.fileAddressLine.text(),'r')
+            except Exception:
+                self.showWarningWin('文件路径不存在')
+
+            filePath = self.fileAddressLine.text()
+            targetID = self.p2pCallingRequestLine.text()
+            self.fileAddressLine.clear()
+
+            if self.clientCore.sendFile(filePath, targetID):
+                return
+            
+    def showWarningWin(self, warning, title=' '):
+        closeBox = QMessageBox(QMessageBox.Critical, title, warning, QMessageBox.NoButton, self)
+        okButton = closeBox.addButton('OK', QMessageBox.YesRole)
+        closeBox.setIcon(1)
+        closeBox.setGeometry(900,500,0,0)
+        okButton.clicked.connect(closeBox.close)
+        closeBox.show()
 
 
 # if __name__ == "__main__":

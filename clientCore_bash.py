@@ -2,10 +2,10 @@ import socket
 import threading
 import time
 import queue
-from Client.audioCore import AUDIOSERVER, AUDIOCLIENT
+from audioCore import AUDIOSERVER, AUDIOCLIENT
 
-serverIP = '127.0.0.1'
-# serverIP = '192.168.43.205'
+# serverIP = '127.0.0.1'
+serverIP = '192.168.43.205'
 serverPort = 1919
 audioPort = 8087
 connectPort = 8086
@@ -60,8 +60,8 @@ class CLIENTCORE():
         self.orderThread.setDaemon(True)
         self.orderThread.start()
         # 通话服务器设置
-        self.audioServer = AUDIOSERVER(socket.gethostbyname(
-            socket.gethostname()), self, audioPort)
+        # self.audioServer = AUDIOSERVER(socket.gethostbyname(
+            # socket.gethostname()), self, audioPort)
         # self.audioServer = AUDIOSERVER('192.168.43.205', self)
         # 其他变量
         self.registerID = ''

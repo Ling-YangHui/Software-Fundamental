@@ -3,12 +3,15 @@ import threading
 import time
 import queue
 from audioCore import AUDIOSERVER, AUDIOCLIENT
+from fileCore import FILECLIENT, FILESERVER
 
 # serverIP = '127.0.0.1'
 serverIP = '192.168.43.205'
 serverPort = 1919
 audioPort = 8087
-connectPort = 8086
+audioConnectPort = 8086
+filePort = 8088
+fileConnectPort = 8089
 
 
 class clientError(Exception):
@@ -63,6 +66,8 @@ class CLIENTCORE():
         self.orderThread.start()
         # 通话服务器设置
         self.audioServer = AUDIOSERVER(self.localIP, self, audioPort)
+        self.fileServer = FILESERVER(self.localIP, filePort, self)
+        # 文件服务器设置
         # self.audioServer = AUDIOSERVER('192.168.43.205', self)
         # 其他变量
         self.registerID = ''
@@ -74,6 +79,8 @@ class CLIENTCORE():
         self.requireCallingTarget = ''
         self.callingIP = ''
         self.callingPos = 'slave'
+        self.filePath = ''
+        self.fileTarget = ''
 
     def waitString(self):
         while True:
@@ -100,7 +107,7 @@ class CLIENTCORE():
                     elif stringList[0] == 'ReceiveCallingIP':
                         self.callingIP = stringList[1]
                         self.audioClient = AUDIOCLIENT(
-                            self.callingIP, connectPort, self)
+                            self.callingIP, audioConnectPort, self)
                         self.sendToFrontQueue.put('ReceiveCalling')
                         self.sendToFrontEvent.set()
                         self.callingPos = 'master'  # 客户端
@@ -115,6 +122,7 @@ class CLIENTCORE():
                     elif stringList[0] == 'CallingEnd':
                         self.callingIP = ''
                         self.requireCallingTarget = ''
+                        self.audioClient = None
                         self.sendToFrontQueue.put('CallingEnd')
                         self.sendToFrontEvent.set()
 
@@ -123,6 +131,21 @@ class CLIENTCORE():
                         self.requireCallingTarget = ''
                         self.sendToFrontQueue.put('CallingEnd')
                         self.sendToFrontEvent.set()
+
+                    elif stringList[0] == 'FileSendingIP':
+                        self.fileIP = stringList[1]
+                        self.fileClient = FILECLIENT(self.fileIP, fileConnectPort, self.filePath, self)
+
+                    elif stringList[0] == 'FileEnd':
+                        self.fileIP = ''
+                        self.fileTarget = ''
+                        self.fileClient = None
+                        self.sendToFrontQueue.put('FileEnd')
+                        self.sendToFrontEvent.set()
+                        self.link.send('FileSendingClose')
+                    
+                    elif stringList[0] == 'PassFileSending':
+                        self.fileServer.starFile()
 
                     elif stringList[0] == 'UserName':
                         self.userName = stringList[1]
@@ -160,7 +183,7 @@ class CLIENTCORE():
             successRecv = False
             self.link.send('RefreshGroupList$'.encode('utf8'))
             while not successRecv:
-                string = self.messageQueue.get(True, timeout=2)
+                string:str = self.messageQueue.get(True, timeout=2)
                 stringList = string.split('$')
                 if stringList[0] != 'UserGroupList':
                     self.messageQueue.put(string)
@@ -348,6 +371,29 @@ class CLIENTCORE():
                     successRecv = True
 
             return (stringList[1] == 'True')
+        except Exception:
+            return False
+
+    def sendFile(self, filePath, targetID):
+        try:
+            self.filePath = filePath
+            self.link.send(('FileSending$' + targetID).encode('utf8'))
+            successRecv = False
+            while not successRecv:
+                string = self.messageQueue.get(True, timeout=2)
+                stringList = string.split('$')
+                if stringList[0] != 'FileSending':
+                    self.messageQueue.put(string)
+                else:
+                    successRecv = True
+
+            if stringList[1] == 'False':
+                return False
+            else:
+                self.fileTarget = targetID
+                self.messageQueue.put('FileSendingIP' + stringList[1])
+                return True
+        
         except Exception:
             return False
 
