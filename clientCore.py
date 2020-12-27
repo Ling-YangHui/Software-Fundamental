@@ -5,18 +5,18 @@ import queue
 from audioCore import AUDIOSERVER, AUDIOCLIENT
 from fileCore import FILECLIENT, FILESERVER
 
-# serverIP = '127.0.0.1'
-serverIP = '192.168.43.205'
+serverIP = '127.0.0.1'
+# serverIP = '192.168.43.205'
 serverPort = 1919
 audioPort = 8087
 audioConnectPort = 8086
 filePort = 8088
-fileConnectPort = 8088
+fileConnectPort = 8089
 
-# audioPort = 8086
-# audioConnectPort = 8087
-# filePort = 8089
-# fileConnectPort = 8088
+audioPort = 8086
+audioConnectPort = 8087
+filePort = 8089
+fileConnectPort = 8088
 
 
 class clientError(Exception):
@@ -49,7 +49,8 @@ class CLIENTCORE():
 
     def __init__(self):
         # self.localIP = socket.gethostbyname(socket.gethostname())
-        self.localIP = '192.168.43.205'
+        # self.localIP = '192.168.43.205'
+        self.localIP = '127.0.0.1'
         self.link = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.link.connect((serverIP, serverPort))
         # 启动心跳包
@@ -63,6 +64,8 @@ class CLIENTCORE():
         self.messageThread = threading.Thread(target=self.waitString)
         self.messageThread.setDaemon(True)
         self.messageThread.start()
+        self.sendToFrontQueue = queue.Queue()
+        self.newBuildGroupQueue = queue.Queue()
         # 指令接受线程
         self.messageEvent = threading.Event()
         self.sendToFrontEvent = threading.Event()
@@ -78,9 +81,7 @@ class CLIENTCORE():
         self.registerID = ''
         self.ID = ''
         self.userName = ''
-        self.newBuildGroupQueue = queue.Queue()
         self.groupList = []
-        self.sendToFrontQueue = queue.Queue()
         self.requireCallingTarget = ''
         self.callingIP = ''
         self.callingPos = 'slave'

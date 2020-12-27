@@ -8,7 +8,7 @@
 
 import user_rc
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtGui import QPalette, QBrush, QPixmap
+from PyQt5.QtGui import QPalette, QBrush, QPixmap, QIcon
 import os
 
 
@@ -17,6 +17,7 @@ class Ui_Form(object):
         Form.setObjectName("Form")
         Form.resize(936, 660)
         Form.setFixedSize(936, 660)
+        Form.setWindowIcon(QIcon(os.getcwd()+'/ClientSource/Image/Icon.png'))
         Form.setStyleSheet("*\n"
                            "{\n"
                            "font:normal 25px \"微软雅黑\";\n"

@@ -6,8 +6,9 @@
 #
 # WARNING! All changes made in this file will be lost!
 
-import image_rc
+import image_rc, os
 from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5.QtGui import QIcon
 
 
 class Main_Ui_Form(object):
@@ -18,6 +19,7 @@ class Main_Ui_Form(object):
         Form.resize(1304, 955)
         Form.setFixedSize(1304, 955)
         Form.setStyleSheet("")
+        Form.setWindowIcon(QIcon(os.getcwd()+'/ClientSource/Image/Icon.png'))
         self.GroupAndUserFrame = QtWidgets.QFrame(Form)
         self.GroupAndUserFrame.setGeometry(QtCore.QRect(90, 30, 431, 891))
         self.GroupAndUserFrame.setStyleSheet("*{\n"

@@ -15,8 +15,8 @@ class Main(QtWidgets.QWidget, Main_Ui_Form):
     groupRefreshSignal = QtCore.pyqtSignal(str)  # 群组信号槽
     askCallingSignal = QtCore.pyqtSignal(str)  # 电话请求信号槽
     showCallingSignal = QtCore.pyqtSignal(str)  # 电话接通信号槽
-    showWarningSignal = QtCore.pyqtSignal(str)
-    unlockP2PLineSignal = QtCore.pyqtSignal(str)
+    showWarningSignal = QtCore.pyqtSignal(str)  # 警报展示信号槽
+    unlockP2PLineSignal = QtCore.pyqtSignal(str)  # P2P展示解锁信号槽
 
     def __init__(self, client, parent=None):
         super(Main, self).__init__(parent)
@@ -28,10 +28,10 @@ class Main(QtWidgets.QWidget, Main_Ui_Form):
         self.addGroupButton.clicked.connect(self.addGroupRequest)
         self.inviteButton.clicked.connect(self.inviteAddGroup)
         self.sendOrCloseP2PButton.clicked.connect(self.sendP2PCallingRequset)
-        self.sendMessageButton.clicked.connect(self.sendP2PMessage)
+        self.sendMessageButton.clicked.connect(self.sendMessage)
 
         # self.sendVideoButton.clicked.connect(self.sendP2PAudioRequest)
-        # self.sendAudioButton.clicked.connect(self.sendP2PVideoRequest)
+        self.sendAudioButton.clicked.connect(self.sendP2PCallingRequset)
         self.sendFileButton.clicked.connect(self.sendP2PFileRequest)
         self.groupListStr = []
         self.groupMessage = []
@@ -212,7 +212,7 @@ class Main(QtWidgets.QWidget, Main_Ui_Form):
                 self.sendOrCloseP2PButton.setText("开始")
                 self.isCalling = False
 
-    def sendP2PMessage(self):
+    def sendMessage(self):
         # toPlainText()方法可以获取当前文本编辑器内的多行文本
         if self.sendMessageText.toPlainText() != '':
             # //此处添加发送信息代码
@@ -221,9 +221,9 @@ class Main(QtWidgets.QWidget, Main_Ui_Form):
                 ), self.clientCore.groupList[self.nowChosenGroup][0])
                 self.sendMessageText.clear()
 
-    def showP2PMessage(self, Name, ID, message):
-        self.showTextBrowser.append("{}({})  {} :\n{}".format(
-            Name, ID, datetime.datetime.now().strftime('%F-%T'), message))
+    # def showP2PMessage(self, Name, ID, message):
+    #     self.showTextBrowser.append("{}({})  {} :\n{}".format(
+    #         Name, ID, datetime.datetime.now().strftime('%F-%T'), message))
 
     # 槽函数
     def groupListWidgetCmd(self, groupList):
@@ -257,6 +257,7 @@ class Main(QtWidgets.QWidget, Main_Ui_Form):
                 file = open(self.fileAddressLine.text(), 'r')
             except Exception:
                 self.showWarningWin('文件路径不存在')
+                return
 
             filePath = self.fileAddressLine.text()
             targetID = self.p2pCallingRequestLine.text()

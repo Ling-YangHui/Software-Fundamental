@@ -3,6 +3,7 @@ import socket
 import queue
 import random
 import json
+import traceback
 
 
 class USERLIST(object):  # 用户列表类
@@ -40,7 +41,7 @@ class USERLIST(object):  # 用户列表类
                     jsonList.setUserJson(userJson)
                 self.selfLock.release()
             except Exception as Error:
-                print(Error)
+                print(traceback.format_exc())
                 return False
             return True
 
@@ -50,7 +51,7 @@ class USERLIST(object):  # 用户列表类
                 if groupID in self.groupList:
                     groupList.sendMessage(self.ID, message)
             except Exception as Error:
-                print(Error)
+                print(traceback.format_exc())
                 return False
             return True
 
@@ -61,7 +62,7 @@ class USERLIST(object):  # 用户列表类
                     self.connect.send(message.encode('utf8'))
                     self.selfLock.release()
             except Exception as Error:
-                print(Error)
+                print(traceback.format_exc())
                 return False
             return True
 
@@ -76,7 +77,7 @@ class USERLIST(object):  # 用户列表类
                     self.isOnline = True
                     self.selfLock.release()
             except Exception as Error:
-                print(Error)
+                print(traceback.format_exc())
                 return False
             return True
 
@@ -91,7 +92,7 @@ class USERLIST(object):  # 用户列表类
                     self.isCalling = True
                     self.selfLock.release()
             except Exception as Error:
-                print(Error)
+                print(traceback.format_exc())
                 return False
             return True
 
@@ -101,7 +102,7 @@ class USERLIST(object):  # 用户列表类
                 self.waiting = ID
                 self.selfLock.release()
             except Exception as Error:
-                print(Error)
+                print(traceback.format_exc())
                 return False
             return True
 
@@ -111,7 +112,7 @@ class USERLIST(object):  # 用户列表类
                 self.waitingFile = ID
                 self.selfLock.release()
             except Exception as Error:
-                print(Error)
+                print(traceback.format_exc())
                 return False
             return True
 
@@ -124,7 +125,7 @@ class USERLIST(object):  # 用户列表类
                     self.isFiling = True
                 self.selfLock.release()
             except Exception as Error:
-                print(Error)
+                print(traceback.format_exc())
                 return False
             return True
 
@@ -134,7 +135,7 @@ class USERLIST(object):  # 用户列表类
                 self.p2pIP = IP
                 self.selfLock.release()
             except Exception as Error:
-                print(Error)
+                print(traceback.format_exc())
                 return False
             return True
 
@@ -148,7 +149,7 @@ class USERLIST(object):  # 用户列表类
                         '%' + groupList.getName(index) + '$'  # index为群组ID
                 self.sendMessageToUser(message)
             except Exception as Error:
-                print(Error)
+                print(traceback.format_exc())
                 return False
             return True
 
@@ -178,7 +179,7 @@ class USERLIST(object):  # 用户列表类
             jsonList.setUserJson(newUserDict, new=True)
         # 任何错误都要抛出一个异常，并且表示运行执行错误
         except Exception as Error:
-            print(Error)
+            print(traceback.format_exc())
             return -1
         return loginID
 
@@ -203,7 +204,7 @@ class USERLIST(object):  # 用户列表类
             else:
                 return False
         except IndexError as Error:
-            print(Error)
+            print(traceback.format_exc())
             return False
 
     def refreshUserGroupList(self, ID, arg='ask'):
@@ -250,6 +251,7 @@ class USERLIST(object):  # 用户列表类
         try:
             return self.__loginIDList.index(loginID)
         except Exception:
+            print(traceback.format_exc())
             return -2
 
     def ID2LoginID(self, ID):
@@ -359,7 +361,7 @@ class GROUPLIST(object):  # 群聊组表类
             jsonList.setGroupJson(groupJson, new=True)
 
         except Exception as Error:
-            print(Error)
+            print(traceback.format_exc())
             return -2
         return searchID
 
@@ -384,7 +386,7 @@ class GROUPLIST(object):  # 群聊组表类
             self.__groupList[ID].messageQueue.put(message)
             self.__groupList[ID].groupEvent.set()
         except Exception as Error:
-            print(Error)
+            print(traceback.format_exc())
             return False
         return True
 
@@ -393,7 +395,7 @@ class GROUPLIST(object):  # 群聊组表类
             self.__groupList[ID].joinQueue.put(userID)
             self.__groupList[ID].groupEvent.set()
         except Exception as Error:
-            print(Error)
+            print(traceback.format_exc())
             return False
         return True
 
@@ -408,12 +410,14 @@ class GROUPLIST(object):  # 群聊组表类
         try:
             return self.__searchIDList.index(searchID)
         except Exception:
+            print(traceback.format_exc())
             return -2
 
     def ID2searchID(self, ID):
         try:
             return self.__searchIDList[ID]
         except Exception:
+            print(traceback.format_exc())
             return -2
 
 
@@ -636,7 +640,7 @@ class LINKLIST(object):
 
                 # 操作形式错误
                 except Exception as Error:
-                    print(Error)
+                    print(traceback.format_exc())
                     self.__connect.send('FatalFalse$'.encode('utf8'))
 
     __linkThreadList = []
