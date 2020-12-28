@@ -30,19 +30,31 @@ class FILESERVER:
             # 接收文件名与大小
             self.jsonString = self.connect.recv(2048)
             self.jsonDictionary = json.loads(self.jsonString.decode())
+            print('文件大小: {} kb, 开始接收'.format(self.jsonDictionary['size'] / 1024))
             # 编写新文件绝对路径
             path = os.path.join(self.storePath, self.jsonDictionary["name"])
             self.filePath = os.path.join(
                 self.storePath, self.jsonDictionary["name"])
             isNewFile = False
             num = 1
+            
+            name:str = self.jsonDictionary['name']
+            nameWithoutExternList = name.split('.')
+            nameWithoutExtern = ''
+            nameExtern = ''
+            for i in range(len(nameWithoutExternList) - 1):
+                nameWithoutExtern += nameWithoutExternList[i]
+            if len(nameWithoutExternList) != 1:
+                nameExtern = nameWithoutExternList[-1]
+
             while not isNewFile:
                 try:
                     file = open(self.filePath, 'r')
                 except Exception:
                     isNewFile = True
                 if isNewFile == False:
-                    self.filePath = path + '(' + str(num) + ')'
+                    name = nameWithoutExtern + '(' + str(num) + ')' + nameExtern
+                    self.filePath = os.path.join(self.storePath, name)
                     num += 1
             # 向客户端发送可以接收文件内容的信号
             self.connect.send("Ture".encode())
@@ -51,6 +63,8 @@ class FILESERVER:
                 while self.receivedSize < self.jsonDictionary["size"]:
                     file.write(self.connect.recv(self.receiveSize))
                     self.receivedSize += self.receiveSize
+                    print('                                                             ', end='\r')
+                    print('接收进度: {}%'.format(self.receivedSize / self.jsonDictionary['size'] * 100), end='\r')
         except Exception as E:
             self.clientCore.messageQueue.put('FileEnd')
             self.clientCore.messageEvent.set()
@@ -59,6 +73,7 @@ class FILESERVER:
             print(E)
             return
 
+        print('接收结束')
         self.connect.shutdown(socket.SHUT_RDWR)
         self.connect.close()
         self.clientCore.messageQueue.put('FileEnd')
@@ -84,6 +99,7 @@ class FILECLIENT:
         self.fileName = os.path.basename(filePath)
         self.fileSize = os.path.getsize(filePath)
         # 发送文件名与大小
+        print('文件大小: {} kb, 开始发送'.format(self.fileSize / 1024))
         self.jsonDictionary = {"name": self.fileName, "size": self.fileSize}
         self.jsonString = json.dumps(self.jsonDictionary).encode("utf-8")
         try:
@@ -95,6 +111,8 @@ class FILECLIENT:
                     while self.sentSize < self.fileSize:
                         self.fileClient.send(file.read(1024))
                         self.sentSize += self.sendSize
+                        print('                                                             ', end='\r')
+                        print('发送进度: {}%'.format(self.sentSize / self.fileSize * 100), end='\r')
         except Exception as E:
             self.clientCore.messageQueue.put('FileEnd')
             self.clientCore.messageEvent.set()
@@ -103,6 +121,7 @@ class FILECLIENT:
             print(E)
             return
 
+        print('发送结束')
         self.fileClient.shutdown(socket.SHUT_RDWR)
         self.fileClient.close()
         self.clientCore.messageQueue.put('FileEnd')
