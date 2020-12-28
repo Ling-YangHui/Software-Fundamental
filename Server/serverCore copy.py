@@ -726,8 +726,8 @@ class JSONLIST(object):
 
 
 # 监听初始化
-# IP = '127.0.0.1'
-IP = '192.168.43.205'
+IP = '127.0.0.1'
+# IP = '192.168.43.205'
 port = 1919
 
 SOC = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  # 设置socket模式

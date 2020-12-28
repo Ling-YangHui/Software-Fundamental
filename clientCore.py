@@ -5,17 +5,17 @@ import queue
 from audioCore import AUDIOSERVER, AUDIOCLIENT
 from fileCore import FILECLIENT, FILESERVER
 
-# serverIP = '127.0.0.1'
-serverIP = '192.168.43.205'
+serverIP = '127.0.0.1'
+# serverIP = '192.168.43.205'
 serverPort = 1919
-# audioPort = 8087
+audioPort = 8087
 audioConnectPort = 8086
 filePort = 8088
-# fileConnectPort = 8089
+fileConnectPort = 8089
 
 audioPort = 8086
-# audioConnectPort = 8087
-# filePort = 8089
+audioConnectPort = 8087
+filePort = 8089
 fileConnectPort = 8088
 
 

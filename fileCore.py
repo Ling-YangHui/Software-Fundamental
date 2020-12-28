@@ -58,13 +58,14 @@ class FILESERVER:
                     num += 1
             # 向客户端发送可以接收文件内容的信号
             self.connect.send("Ture".encode())
+            fileSize = self.jsonDictionary['size']
             with open(self.filePath, 'wb') as file:
                 # 开始写文件
-                while self.receivedSize < self.jsonDictionary["size"]:
-                    file.write(self.connect.recv(self.receiveSize))
-                    self.receivedSize += self.receiveSize
-                    print('                                                             ', end='\r')
-                    print('接收进度: {}%'.format(self.receivedSize / self.jsonDictionary['size'] * 100), end='\r')
+                while self.receivedSize < fileSize:
+                    cache = self.connect.recv(1024)
+                    file.write(cache)
+                    self.receivedSize += len(cache)
+                    print('接收进度: ' + str(self.receivedSize) + '/' + str(fileSize),end='\r')
         except Exception as E:
             self.clientCore.messageQueue.put('FileEnd')
             self.clientCore.messageEvent.set()
@@ -72,6 +73,18 @@ class FILESERVER:
             self.connect.close()
             print(E)
             return
+
+        self.connect.settimeout(30)
+        try:
+            self.connect.send(self.jsonDictionary['name'].encode('utf8'))
+            string = self.connect.recv(65536).decode('utf8')
+            if string == self.jsonDictionary['name']:
+                pass
+            else:
+                print(string)
+                print('接收失败')
+        except Exception as E:
+            print(E)
 
         print('接收结束')
         self.connect.shutdown(socket.SHUT_RDWR)
@@ -109,10 +122,9 @@ class FILECLIENT:
                 with open(filePath, 'rb') as file:
                     # 读取文件
                     while self.sentSize < self.fileSize:
-                        self.fileClient.send(file.read(1024))
+                        self.sendSize = self.fileClient.send(file.read(1024))
                         self.sentSize += self.sendSize
-                        print('                                                             ', end='\r')
-                        print('发送进度: {}%'.format(self.sentSize / self.fileSize * 100), end='\r')
+                        print('发送进度: ' + str(self.sentSize) + '/' + str(self.fileSize), end='\r')
         except Exception as E:
             self.clientCore.messageQueue.put('FileEnd')
             self.clientCore.messageEvent.set()
@@ -120,6 +132,17 @@ class FILECLIENT:
             self.fileClient.close()
             print(E)
             return
+
+        self.fileClient.settimeout(30)
+        try:
+            string = self.fileClient.recv(65536).decode('utf8')
+            if string == self.jsonDictionary['name']:
+                self.fileClient.send(self.jsonDictionary['name'].encode('utf8'))
+            else:
+                print(string)
+                print('发送失败')
+        except Exception as E:
+            print(E)
 
         print('发送结束')
         self.fileClient.shutdown(socket.SHUT_RDWR)
